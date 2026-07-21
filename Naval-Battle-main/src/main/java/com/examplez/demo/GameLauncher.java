@@ -1,0 +1,32 @@
+package com.examplez.demo;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+/**
+ * GameLauncher starts the program launching the menu-view.fxml
+ */
+
+public class GameLauncher extends Application {
+
+    /**
+     * JavaFX entry point, called by the platform after {@link Launcher#main}
+     * invokes {@link Application#launch}. Loads the initial menu view and
+     * shows it on the primary stage.
+     *
+     * @param stage the primary stage provided by the JavaFX runtime
+     * @throws IOException if the menu view FXML cannot be found or loaded
+     */
+    @Override
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(GameLauncher.class.getResource("menu-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        stage.setTitle("Hello!");
+        stage.setScene(scene);
+        stage.show();
+    }
+}
