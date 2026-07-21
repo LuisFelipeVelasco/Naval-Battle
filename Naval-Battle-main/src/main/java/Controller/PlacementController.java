@@ -20,6 +20,15 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+/**
+ * Controller for the ship placement view (PlaceShips-View.fxml).
+ * <p>
+ * Handles the whole placement phase for the human player: drawing the
+ * empty 10x10 board, letting the player drag ships from the pending
+ * fleet list and drop them on the board, rotating the current
+ * orientation, and, once the whole fleet is placed, triggering the
+ * machine's own (random) placement and switching to the play view.
+ */
 public class PlacementController {
     private static final double CELL_SIZE = 35;
     private static final double GAP = 2;
@@ -33,12 +42,26 @@ public class PlacementController {
     private boolean horizontal = true;
     private static final int SIZE = 10;
 
+    /**
+     * JavaFX lifecycle method, called automatically right after the FXML
+     * is loaded. Builds the empty board cells and disables the
+     * "start match" button until the whole fleet has been placed.
+     */
     @FXML
     private void initialize(){
         createCells();
         startMatchButton.setDisable(true);
 
     }
+
+    /**
+     * Initializes the placement phase with a freshly created game model.
+     * Retrieves the human player from the game, creates its empty board
+     * and fleet, and fills the pending ships list view with the fleet
+     * that still needs to be placed.
+     *
+     * @param game the game model created by {@link StartController}
+     */
     public void initGame(Game game){
         this.gameModel = game;
         this.playerHuman = game.getPlayerHuman();
@@ -47,6 +70,12 @@ public class PlacementController {
         pendingShipsListView.setItems(FXCollections.observableArrayList(playerHuman.getShips()));
         setDragFromListView();
     }
+
+    /**
+     * Creates the 100 visual cells of the board as {@link StackPane}
+     * nodes, each one listening for drag-over and drag-dropped events so
+     * that ships can be dropped on them.
+     */
     private void createCells(){
         for (int fila = 0; fila < SIZE; fila++){
             for (int columna = 0; columna < SIZE; columna++){
@@ -65,6 +94,13 @@ public class PlacementController {
             }
         }
     }
+    /**
+     * Enables dragging a ship out of the pending ships list view. The
+     * currently selected ship's type is stored on the {@link Dragboard}
+     * so the drop target can identify what is being dragged, although
+     * the actual ship instance used for placement is read directly from
+     * the list view's selection model when the drop happens.
+     */
     private void setDragFromListView(){
         pendingShipsListView.setOnDragDetected(event -> {
             Ship selected = pendingShipsListView.getSelectionModel().getSelectedItem();
@@ -77,10 +113,23 @@ public class PlacementController {
             event.consume();
         });
     }
+
+    /**
+     * Toggles the orientation used for the next ship placement, between
+     * horizontal and vertical.
+     */
     @FXML
     private void onRotateButton(){
         horizontal = !horizontal;
     }
+
+    /**
+     * Handles the "start match" button: makes the machine player create
+     * its own board and place its fleet randomly, then switches the
+     * scene to the play view so the shooting phase can begin.
+     *
+     * @param event the action event used to obtain the current stage
+     */
     @FXML
     private void onStartMatchButton(ActionEvent event){
 
@@ -88,12 +137,31 @@ public class PlacementController {
         // cambiar a PlayView.fxml pasando gameModel al PlayController
         changePlayGameView(event);
     }
+
+    /**
+     * Accepts a drag-over event on a board cell, as long as the drag
+     * gesture did not originate from the board itself.
+     *
+     * @param event the drag event to accept
+     */
     private void onDragOver(DragEvent event){
         if (event.getGestureSource() != boardGrid){
             event.acceptTransferModes(TransferMode.MOVE);
         }
         event.consume();
     }
+
+    /**
+     * Handles dropping the currently selected ship onto the given board
+     * cell: attempts to place it on the human player's board, and if
+     * valid, draws the ship shape, removes it from the pending list and
+     * enables the "start match" button once the whole fleet is placed.
+     * If the position is invalid, shows an error instead.
+     *
+     * @param event  the drag-dropped event
+     * @param row    the target row index
+     * @param column the target column index
+     */
     private void onDragDropped(DragEvent event, int row, int column){
         Ship selected = pendingShipsListView.getSelectionModel().getSelectedItem();
 
@@ -113,9 +181,23 @@ public class PlacementController {
         event.setDropCompleted(true);
         event.consume();
     }
+    /**
+     * Displays an error message to the user. (Not yet implemented.)
+     *
+     * @param message the error message to display
+     */
     private void showError(String message){
         // Alert simple o Label
     }
+
+    /**
+     * Draws the given ship as a single figure spanning all the cells it
+     * occupies, and adds it to the board grid on top of the empty cells.
+     *
+     * @param ship   the ship that was just placed
+     * @param row    the ship's starting row index
+     * @param column the ship's starting column index
+     */
     private void drawShip(Ship ship, int row, int column){
         Node ShipFigure = createShipShape(ship, horizontal);
 
@@ -126,6 +208,17 @@ public class PlacementController {
 
         boardGrid.getChildren().add(ShipFigure);
     }
+
+    /**
+     * Builds the 2D figure used to represent a ship on the board: a
+     * rounded rectangle for the hull, plus a smaller centered rectangle
+     * ("tower") for ships of size 2 or more, so that they can be visually
+     * distinguished from a single-cell frigata.
+     *
+     * @param ship       the ship to build a figure for
+     * @param horizontal {@code true} to build a horizontal figure, {@code false} for vertical
+     * @return a node representing the ship, ready to be added to the board grid
+     */
     private Node createShipShape(Ship ship, boolean horizontal){
         int longShip = ship.getSize();
         double mayorLong = longShip * CELL_SIZE + (longShip - 1) * GAP;
@@ -162,10 +255,21 @@ public class PlacementController {
     }
 
 
+    /**
+     * Reserved for a possible threaded ship-selection mechanism.
+     * (Not yet implemented.)
+     */
     private void createThreadOfShips(){
 
     }
 
+    /**
+     * Switches the current scene to the play view, passing the shared
+     * game model (with both fleets already placed) to the new
+     * {@link PlayController}.
+     *
+     * @param event the action event used to obtain the current stage
+     */
     private void changePlayGameView(ActionEvent event){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
@@ -183,6 +287,10 @@ public class PlacementController {
             showError("Dont possible to load the view: " + e.getMessage());
         }
     }
+    /**
+     * Shows the opponent's (machine's) board for verification purposes.
+     * (Not yet implemented.)
+     */
     private void showBoard(){
 
     }

@@ -10,22 +10,51 @@ import javafx.scene.paint.Color;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Controller for the play view (PlayView.fxml), where the shooting
+ * phase of the match takes place.
+ * <p>
+ * Manages two boards: the main board (the machine's territory, where
+ * the human player shoots) and the position board (the human player's
+ * own territory, shown in observation mode only).
+ */
 public class PlayController {
     @FXML private GridPane mainBoardGrid;
     @FXML private GridPane positionBoardGrid;
 
     private StackPane[][] mainCells = new StackPane[10][10];
     private StackPane[][] positionCells = new StackPane[10][10];
+
+    /**
+     * JavaFX lifecycle method, called automatically right after the FXML
+     * is loaded. Builds the empty visual cells for both boards.
+     */
     @FXML public void initialize(){
         createCells(mainBoardGrid, mainCells, true);
         createCells(positionBoardGrid, positionCells, false);
     }
     private Game gameModel;
 
+    /**
+     * Injects the shared game model into this controller. Must be called
+     * before {@link #loadBoard()} so that both boards can be drawn from
+     * the actual placement made during the previous phase.
+     *
+     * @param gameModel the game model, with both fleets already placed
+     */
     public void setGameModel(Game gameModel){
         this.gameModel = gameModel;
 
     }
+
+    /**
+     * Creates the 100 visual cells of a board as {@link StackPane} nodes
+     * and adds them to the given grid.
+     *
+     * @param grid       the grid pane to fill with cells
+     * @param cells      the matrix where the created cells are stored for later access
+     * @param allowClick reserved for enabling click handling on this board (not yet wired up)
+     */
     private void createCells(GridPane grid, StackPane[][] cells, boolean allowClick){
         for (int row = 0; row < 10; row++){
             for (int column = 0; column < 10; column++){
@@ -45,12 +74,25 @@ public class PlayController {
             }
         }
     }
+    /**
+     * Draws the initial state of both boards from the game model. Must
+     * be called once, right after {@link #setGameModel(Game)}, so the UI
+     * reflects whatever state already exists in the model (e.g. a
+     * freshly started match with both fleets placed).
+     */
     public void loadBoard(){
         drawMainBoard();
         drawPositionBoard();
         // recorre gameModel.getPlayerHuman().getBoard() y gameModel.getPlayerMachine().getBoard()
         // y pinta las celdas correspondientes en los GridPane ya creados por initialize()
     }
+
+    /**
+     * Paints the main board (the machine's territory) based on the
+     * current state of the machine player's board: only the results of
+     * shots already taken (water, hit, sunked) are reflected; ships that
+     * have not been hit remain hidden.
+     */
     private void drawMainBoard(){
         List<List<Cell>> board = gameModel.getPlayerMachine().getBoard().getBoard();
 
@@ -68,6 +110,12 @@ public class PlayController {
             }
         }
     }
+    /**
+     * Paints the position board (the human player's own territory)
+     * based on the current state of the human player's board: own ships
+     * are shown, along with any shots the machine has already made
+     * against them.
+     */
     private void drawPositionBoard(){
         List<List<Cell>> board = gameModel.getPlayerHuman().getBoard().getBoard();
 

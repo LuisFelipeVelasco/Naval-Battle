@@ -12,18 +12,36 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller for the initial menu view (menu-view.fxml).
+ * <p>
+ * Currently only handles starting a brand new game: it creates a fresh
+ * {@link Game} model with both players and switches the scene to the
+ * ship placement view.
+ */
 public class StartController {
 
     @FXML private Button InitialButton;
 
+    /**
+     * Handles the click on the initial button, starting a new game.
+     *
+     * @param event the action event fired by the button
+     * @throws IOException if the placement view FXML cannot be loaded
+     */
     @FXML
     private void onMouseClicked(ActionEvent event) throws IOException {
         changeGameView(event);
     }
 
     /**
-     * Cambia la escena actual hacia la vista de colocación de barcos,
-     * iniciando una partida nueva.
+     * Switches the current scene to the ship placement view, starting a
+     * new match: creates a new {@link Game}, creates both the human and
+     * machine players, and hands the game model over to the
+     * {@link PlacementController} of the new scene.
+     *
+     * @param event the action event used to obtain the current {@link Stage}
+     * @throws IOException if the placement view FXML cannot be loaded
      */
     private void changeGameView(ActionEvent event) throws IOException {
         String fxml = "/com/examplez/demo/PlaceShips-View.fxml";
