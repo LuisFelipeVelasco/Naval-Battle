@@ -19,6 +19,7 @@ import java.util.List;
  * own territory, shown in observation mode only).
  */
 public class PlayController {
+    private boolean playerTurn= true;
     @FXML private GridPane mainBoardGrid;
     @FXML private GridPane positionBoardGrid;
 
@@ -66,13 +67,49 @@ public class PlayController {
 
                 if (allowClick){
                     final int f = row, c = column;
-                   // VisualCell.setOnMouseClicked(event -> onCellClicked(f, c));
+                    VisualCell.setOnMouseClicked(event -> onCellClicked(f, c));
                 }
 
                 cells[row][column] = VisualCell;
                 grid.add(VisualCell, column, row);
             }
         }
+    }
+    /**
+     * Handles a click on the main board (machine's territory). Processes
+     * the attack, redraws the board, checks for victory, and either lets
+     * the player shoot again (on hit/sunk) or passes the turn to the machine.
+     *
+     * @param row    the row index clicked
+     * @param column the column index clicked
+     */
+    private void onCellClicked(int row, int column){
+        if (!playerTurn) return;
+
+        Board machineBoard = gameModel.getPlayerMachine().getBoard();
+        if (machineBoard.isCellAlreadyAttacked(row, column)) return;
+
+        String result = machineBoard.attackCell(row, column);
+        drawMainBoard();
+
+        if (!gameModel.getPlayerMachine().isPlayerWithShips()){
+            showWinner("Player");
+            return;
+        }
+
+        if (result.equals(Board.WATER)){
+            playerTurn = false;
+           // machineTurn();
+        }
+        // if HIT or SUNKED, the player keeps shooting (nothing else to do)
+    }
+
+    /**
+     * Announces the winner of the match. (Placeholder — will later
+     * transition to a FinalController view.)
+     */
+    private void showWinner(String winner){
+        System.out.println("Winner: " + winner);
     }
     /**
      * Draws the initial state of both boards from the game model. Must
@@ -83,8 +120,8 @@ public class PlayController {
     public void loadBoard(){
         drawMainBoard();
         drawPositionBoard();
-        // recorre gameModel.getPlayerHuman().getBoard() y gameModel.getPlayerMachine().getBoard()
-        // y pinta las celdas correspondientes en los GridPane ya creados por initialize()
+        // it runs gameModel.getPlayerHuman().getBoard() y gameModel.getPlayerMachine().getBoard()
+        // and draw the cells already initialized on the gridpane
     }
 
     /**

@@ -81,5 +81,54 @@ class BoardTest {
         assertThrows(UnvalidPositionException.class, () ->
                 board.placeShip(5, 6, destructor, true));
     }
+    @Test
+    void attackingAnEmptyCellReturnsWater(){
+        String result = board.attackCell(0, 0);
+
+        assertEquals(Board.WATER, result);
+        assertTrue(board.isCellAlreadyAttacked(0, 0));
+    }
+
+    @Test
+    void attackingAShipCellReturnsHitWhenShipStillAfloat() throws UnvalidPositionException {
+        Ship destructor = new Ship("destructor", 2);
+        board.placeShip(1, 1, destructor, true); // ocupa (1,1) y (1,2)
+
+        String result = board.attackCell(1, 1);
+
+        assertEquals(Board.HIT, result);
+        assertTrue(destructor.isShipAfloat()); // still afloat, only 1 of 2 cells hit
+    }
+
+    @Test
+    void attackingTheLastCellOfAShipReturnsSunked() throws UnvalidPositionException {
+        Ship frigata = new Ship("frigata", 1); // a frigata only has 1 cell
+        board.placeShip(2, 2, frigata, true);
+
+        String result = board.attackCell(2, 2);
+
+        assertEquals(Board.SUNKED, result);
+        assertFalse(frigata.isShipAfloat());
+    }
+
+    @Test
+    void sinkingAMultiCellShipMarksAllItsCellsAsSunked() throws UnvalidPositionException {
+        Ship destructor = new Ship("destructor", 2);
+        board.placeShip(3, 0, destructor, true); // ocupa (3,0) y (3,1)
+
+        board.attackCell(3, 0); // first hit, ship still afloat
+        board.attackCell(3, 1); // second hit, ship is now sunk
+
+        assertEquals(Board.SUNKED, board.getBoard().get(3).get(0).getState());
+        assertEquals(Board.SUNKED, board.getBoard().get(3).get(1).getState());
+    }
+
+    @Test
+    void attackingAnAlreadyAttackedCellThrowsException(){
+        board.attackCell(4, 4); // first shot: water
+
+        assertThrows(AlreadyAttackedException.class, () ->
+                board.attackCell(4, 4)); // second shot on the same cell
+    }
     
 }

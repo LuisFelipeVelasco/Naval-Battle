@@ -18,7 +18,7 @@ public class PlayerMachine extends Player{
     @Override
     public void createBoard() {
         this.board= new Board();
-        createShipLIst();
+        this.ships = createShipLIst();
         placeRandomShips();
     }
 

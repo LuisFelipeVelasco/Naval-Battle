@@ -151,4 +151,35 @@ public class Board {
             cell.setState(SHIP);
         }
     }
+    public String attackCell(int row, int column){
+        if (isCellAlreadyAttacked(row,column)){
+            throw new AlreadyAttackedException(row, column);
+        }
+        Cell cell = board.get(row).get(column);
+        Ship ship = cell.getShip();
+
+        if (ship == null){
+            cell.setState(WATER);
+            return WATER;
+        }
+
+        ship.increaseHitOnShip();
+
+        if (!ship.isShipAfloat()){
+            markShipAsSunked(ship);
+            return SUNKED;
+        }
+        cell.setState(HIT);
+        return HIT;
+
+    }
+    private void markShipAsSunked(Ship ship){
+        for (List<Cell> row : board){
+            for (Cell cell : row){
+                if (cell.getShip() == ship){
+                    cell.setState(SUNKED);
+                }
+            }
+        }
+    }
 }
