@@ -1,7 +1,15 @@
 package com.examplez.demo.model;
 
-/**Representation of a ship*/
-public class Ship {
+import java.io.Serializable;
+
+/**Representation of a ship
+ *
+ * <p>Implements {@link Serializable} to allow deep serialization
+ * as part of the GameState saving system.</p>
+ *
+ * @see java.io.Serializable
+ * */
+public class Ship implements Serializable {
     /**ID of the ship*/
     int id;
     /**number of hits received for the ship*/

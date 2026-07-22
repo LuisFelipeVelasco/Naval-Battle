@@ -1,9 +1,16 @@
 package com.examplez.demo.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-/** Representation of a player's board*/
-public class Board {
+/** Representation of a player's board
+ *
+ * <p>Implements {@link Serializable} to support game persistence
+ * within GameState.</p>
+ *
+ * @see java.io.Serializable
+ * */
+public class Board implements Serializable {
     /** matrix that represents the board*/
     List<List<Cell>> board;
     /**
