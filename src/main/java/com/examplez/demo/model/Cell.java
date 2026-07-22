@@ -6,53 +6,79 @@ package com.examplez.demo.model;
 public class Cell {
     /** the state that has the cell (no attacked  , attacked  or sunken )*/
     String state;
-    /** the typeOfShip that has the cell (submarine, destroyer, aircraft carrier, frigate ,no ship)*/
-    String typeOfShip;
-    /** the id that has the ship that is on the cell (-1 water , other - a ship)*/
-    int idOfShip;
+    /** ship on the cell */
+    Ship ship;
 
     /**
-     * Constructor of the cell
-     * @param state describe the state of the cell
-     * @param typeOfShip describe the typeOfShip on the cell
+     * Creates a cell with an explicit state and ship reference.
      *
+     * @param state the initial state of the cell
+     * @param ship  the ship occupying the cell, or {@code null} if empty
      */
-    Cell(String state, String typeOfShip , int idOfShip ){
+    public Cell(String state, Ship ship){
         this.state=state;
-        this.typeOfShip=typeOfShip;
-        this.idOfShip=idOfShip;
+        this.ship=ship;
     }
 
     /**
-     * set a newState to the attribute state
-     * @param newState describe the new state of the cell
-     * @throws IllegalArgumentException if newState is null or different of "no attacked" , "attacked"  or "sunken"
+     * Creates an empty cell: state {@code "blank"} and no ship assigned.
      */
-    void setState(String newState){
-        if(newState==null){
-            throw new IllegalArgumentException(
-                    "newState cannot be null" );
-        }
-        else if(!(newState.equals("no attacked") || newState.equals("attacked") || newState.equals("sunken"))){
-            throw new IllegalArgumentException(
-                "invalid state" + newState );
-        }
+    public Cell() {
+        this.state = "blank";
+        this.ship = null;
+    }
+
+    /**
+     * Updates the state of this cell.
+     *
+     * @param newState the new state to assign
+     */
+    public void setState(String newState){
         state=newState;
     }
 
     /**
-     * @return the state of the cell
+     * Returns the current state of this cell.
+     *
+     * @return the cell's state
      */
-    String getState(){return state;}
+    public String getState(){
+        return state;
+    }
 
     /**
-     * @return the typeOfShip of the cell
+     * Returns the ship occupying this cell.
+     *
+     * @return the ship instance, or {@code null} if the cell is empty
      */
-    String getTypeOfShip(){return typeOfShip;}
+    public Ship getShip(){
+        return ship;
+    }
 
     /**
-     * @return the id of the ship on the cell
+     * Returns the id's ship occupying this cell.
+     *
+     * @return the id's ship, or {@code null} if the cell is empty
      */
-    int getIdOfShip(){return idOfShip;}
+    public int getIdOfShip(){
+        return ship.getId();
+    }
 
+    /**
+     * Assigns a ship to this cell.
+     *
+     * @param ship the ship instance to associate with this cell
+     */
+    public void setShip(Ship ship) {
+        this.ship = ship;
+    }
+
+    /**
+     * Returns the size of the ship occupying this cell.
+     *
+     * @return the sizes' type, or {@code null} if the cell is empty
+     */
+    public int getSizeOfShip(){
+        return (ship != null) ? ship.getSize() : null;
+    }
 }
