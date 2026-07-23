@@ -246,6 +246,13 @@ public class PlayController {
         }
     }
 
+    /**
+     * Load the turn where a game was saved.
+     * */
+    public void restoreLoadedTurn(int turnLoad){
+        playerTurn = turnLoad == 1;
+    }
+
 
 
 }

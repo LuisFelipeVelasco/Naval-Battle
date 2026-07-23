@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane minHeight="560.0" minWidth="760.0" prefHeight="720.0" prefWidth="1100.0" styleClass="screen-root" stylesheets="@start-view.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.StartController">
+<StackPane minHeight="560.0" minWidth="760.0" prefHeight="720.0" prefWidth="1100.0" styleClass="screen-root" stylesheets="@start-view.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.StartController">
 
     <!-- Darkens the image edges without blocking mouse interaction. -->
     <Region mouseTransparent="true" styleClass="space-vignette" />
@@ -68,7 +68,7 @@
 
                         <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" spacing="7.0" styleClass="save-status">
                             <Region maxHeight="5.0" maxWidth="5.0" minHeight="5.0" minWidth="5.0" prefHeight="5.0" prefWidth="5.0" styleClass="save-status-dot" />
-                            <Label styleClass="save-status-label" text="NO SAVED CAMPAIGN DETECTED" />
+                            <Label fx:id="statusLabel" styleClass="save-status-label" text="NO SAVED CAMPAIGN DETECTED" />
                         </HBox>
                     </VBox>
                 </VBox>
