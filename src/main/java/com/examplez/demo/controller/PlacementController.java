@@ -18,6 +18,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.io.IOException;
 
@@ -31,6 +35,13 @@ import java.io.IOException;
  * machine's own (random) placement and switching to the play view.
  */
 public class PlacementController {
+    private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
+    static {
+        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/Images/carrier.png")));
+        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/Images/submarine.png")));
+        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/Images/destructor.png")));
+        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/Images/frigate.png")));
+    }
     private static final double CELL_SIZE = 35;
     private static final double GAP = 2;
     @FXML private GridPane boardGrid;
@@ -216,36 +227,24 @@ public class PlacementController {
      * @return a node representing the ship, ready to be added to the board grid
      */
     private Node createShipShape(Ship ship, boolean horizontal){
-        int longShip = ship.getSize();
-        double mayorLong = longShip * CELL_SIZE + (longShip - 1) * GAP;
+        Image image = SHIP_IMAGES.get(ship.getType());
+
+        double mayorLong = ship.getSize() * CELL_SIZE + (ship.getSize() - 1) * GAP;
         double minorLong = CELL_SIZE - 6;
 
-        double width  = horizontal ? mayorLong : minorLong;
-        double height   = horizontal ? minorLong : mayorLong;
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(mayorLong);
+        imageView.setFitHeight(minorLong);
+        imageView.setPreserveRatio(false);
+        imageView.setSmooth(true);
 
-        Rectangle casco = new Rectangle(width, height);
-        casco.setArcWidth(16);
-        casco.setArcHeight(16);
-        casco.setFill(Color.web("#5c6b73"));
-        casco.setStroke(Color.web("#2c3539"));
-        casco.setStrokeWidth(1.5);
-
-        Group grupo = new Group(casco);
-
-        if (longShip >= 2){
-            double widthTower = horizontal ? CELL_SIZE * 0.5 : minorLong * 0.6;
-            double heightTowe  = horizontal ? minorLong * 0.6 : CELL_SIZE * 0.5;
-
-            Rectangle tower = new Rectangle(widthTower, heightTowe );
-            tower.setArcWidth(8);
-            tower.setArcHeight(8);
-            tower.setFill(Color.web("#8a9ba5"));
-            tower.setLayoutX((width- widthTower) / 2);
-            tower.setLayoutY((height - heightTowe ) / 2);
-            grupo.getChildren().add(tower);
+        Node shipNode = imageView;
+        if (!horizontal){
+            imageView.setRotate(90);
+            shipNode = new Group(imageView); // Group recalcula el bounding box ya rotado
         }
 
-        StackPane container = new StackPane(grupo);
+        StackPane container = new StackPane(shipNode);
         container.setPickOnBounds(false);
         return container;
     }

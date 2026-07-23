@@ -1,5 +1,6 @@
 package com.examplez.demo.controller;
 import javafx.animation.PauseTransition;
+import javafx.scene.control.Label;
 import javafx.scene.shape.Rectangle;
 import com.examplez.demo.model.Board;
 import com.examplez.demo.model.Cell;
@@ -21,6 +22,8 @@ import java.util.List;
  * own territory, shown in observation mode only).
  */
 public class PlayController {
+    @FXML
+    Label turnLabel;
     private boolean playerTurn= true;
     @FXML private GridPane mainBoardGrid;
     @FXML private GridPane positionBoardGrid;
@@ -87,6 +90,7 @@ public class PlayController {
     private void onCellClicked(int row, int column){
         if (!playerTurn) return;
 
+
         Board machineBoard = gameModel.getPlayerMachine().getBoard();
         if (machineBoard.isCellAlreadyAttacked(row, column)) return;
         machineBoard.attackCell(row, column);
@@ -106,6 +110,7 @@ public class PlayController {
 
         if (result.equals(Board.WATER)){
             playerTurn = false;
+            turnLabel.setText("Turno: Máquina");
            machineTurnLoop();
         }
         // if HIT or SUNKED, the player keeps shooting (nothing else to do)
@@ -145,7 +150,7 @@ public class PlayController {
                 Rectangle background = (Rectangle) mainCells[row][column].getChildren().get(0);
 
                 switch (state){
-                    case Board.WATER -> background.setFill(Color.LIGHTBLUE);      // marca de agua (X) se añadiría aparte
+                    case Board.WATER -> background.setFill(Color.BLUE);      // marca de agua (X) se añadiría aparte
                     case Board.HIT -> background.setFill(Color.ORANGE);
                     case Board.SUNKEN -> background.setFill(Color.DARKRED);
                     default -> background.setFill(Color.LIGHTBLUE); // VACIO o BARCO oculto: se ve igual que el agua
@@ -169,7 +174,7 @@ public class PlayController {
 
                 switch (state){
                     case Board.SHIP -> background.setFill(Color.DARKSLATEGRAY);
-                    case Board.WATER -> background.setFill(Color.LIGHTBLUE);
+                    case Board.WATER -> background.setFill(Color.BLUE);
                     case Board.HIT -> background.setFill(Color.ORANGE);
                     case Board.SUNKEN -> background.setFill(Color.DARKRED);
                     default -> background.setFill(Color.LIGHTBLUE); // VACIO
@@ -182,6 +187,7 @@ public class PlayController {
     private void machineTurnLoop(){
     PauseTransition pause = new PauseTransition(Duration.millis(600));
     pause.setOnFinished(event -> {
+        turnLabel.setText("Turno: maquina");
         gameModel.processMachineAttack(); // sigue siendo void, sin tocarla
         drawPositionBoard();
 
@@ -194,7 +200,9 @@ public class PlayController {
 
         String lastResult = humanBoard.getStateLastCellAttacked();
         if (lastResult.equals(Board.WATER)){
+
             playerTurn = true; // se devuelve el turno al jugador
+            turnLabel.setText("Turno: Jugador");
         } else {
             machineTurnLoop(); // la máquina sigue disparando (HIT o SUNKEN)
         }
