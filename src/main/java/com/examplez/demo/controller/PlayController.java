@@ -1,4 +1,6 @@
 package com.examplez.demo.controller;
+import com.examplez.demo.GameFileManager;
+import com.examplez.demo.GameState;
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Rectangle;
@@ -108,6 +110,9 @@ public class PlayController {
             return;
         }
 
+        // Auto save progress after human move
+        autoSaveGame();
+
         if (result.equals(Board.WATER)){
             playerTurn = false;
             turnLabel.setText("Turno: Máquina");
@@ -121,6 +126,9 @@ public class PlayController {
      * transition to a FinalController view.)
      */
     private void showWinner(String winner){
+        // Delete persistent save files when the game ends
+        GameFileManager.deleteGame();
+
         System.out.println("Winner: " + winner);
     }
     /**
@@ -198,6 +206,9 @@ public class PlayController {
             return;
         }
 
+        // Auto save progress after machine move
+        autoSaveGame();
+
         String lastResult = humanBoard.getStateLastCellAttacked();
         if (lastResult.equals(Board.WATER)){
 
@@ -209,6 +220,29 @@ public class PlayController {
     });
     pause.play();
 }
+
+    /**
+     * Helper method that captures current match data and auto-saves it to disk.
+     */
+    private void autoSaveGame() {
+        if (gameModel == null) return;
+
+        try {
+            Board humanBoard = gameModel.getPlayerHuman().getBoard();
+            Board machineBoard = gameModel.getPlayerMachine().getBoard();
+
+            // Current state of the Boards
+            GameState currentState = new GameState(humanBoard, machineBoard);
+
+            int currentTurn = playerTurn ? 1 : 2; // 1 = Human turn, 2 = Machine turn
+            int shipsSunkByHuman = machineBoard.getNumberShipsSunk(); // Ships sunk on machine's board
+            //String nickname = gameModel.getPlayerHuman().getNickname();
+
+            //GameFileManager.saveGame(currentState, currentTurn, shipsSunkByHuman, nickname);
+        } catch (Exception e) {
+            System.err.println("Error automatic saving game: " + e.getMessage());
+        }
+    }
 
 
 

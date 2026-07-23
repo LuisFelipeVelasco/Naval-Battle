@@ -2,8 +2,14 @@ package com.examplez.demo.model;
 
 import java.io.Serializable;
 
-/**Representation of a ship*/
-public class Ship {
+/**Representation of a ship
+ *
+ * <p>Implements {@link Serializable} to support game persistence
+ * within GameState.</p>
+ *
+ * @see java.io.Serializable
+ * */
+public class Ship implements Serializable{
     /**ID of the ship*/
     int id;
     /**Size of ship*/

@@ -1,9 +1,16 @@
 package com.examplez.demo.model;
 
+import java.io.Serializable;
+
 /**
  * Representation of a cell in the board of a player
+ *
+ * <p>Implements {@link Serializable} to support game persistence
+ * within GameState.</p>
+ *
+ * @see java.io.Serializable
  */
-public class Cell {
+public class Cell implements Serializable {
     /** the state that has the cell (no attacked  , attacked  or sunken )*/
     String state;
     /** ship on the cell */
