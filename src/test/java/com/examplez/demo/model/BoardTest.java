@@ -25,7 +25,7 @@ class BoardTest {
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("Coloca un barco horizontal en una posicion valida")
+    @DisplayName("Places a ship horizontally in a valid position")
     void placesShipHorizontally() {
         Ship ship = ShipFactory.createShip(1, "destructor"); // size 2
         assertDoesNotThrow(() -> board.placeShip(0, 0, ship, true));
@@ -35,7 +35,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Coloca un barco vertical en una posicion valida")
+    @DisplayName("Places a ship vertically in a valid position")
     void placesShipVertically() {
         Ship ship = ShipFactory.createShip(1, "submarine"); // size 3
         assertDoesNotThrow(() -> board.placeShip(2, 2, ship, false));
@@ -50,7 +50,7 @@ class BoardTest {
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("Rechaza un barco horizontal que se sale del tablero")
+    @DisplayName("Rejects a horizontal ship placed outside the board")
     void rejectsHorizontalOffBoard() {
         Ship ship = ShipFactory.createShip(1, "carrier"); // size 4
         assertThrows(InvalidPositionException.class,
@@ -58,7 +58,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Rechaza un barco vertical que se sale del tablero")
+    @DisplayName("Rejects a vertical ship placed outside the board")
     void rejectsVerticalOffBoard() {
         Ship ship = ShipFactory.createShip(1, "carrier"); // size 4
         assertThrows(InvalidPositionException.class,
@@ -70,12 +70,12 @@ class BoardTest {
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("Rechaza superposicion directa entre dos barcos")
+    @DisplayName("Rejects direct overlap between two ships")
     void rejectsDirectOverlap() throws InvalidPositionException {
         Ship first = ShipFactory.createShip(1, "submarine"); // size 3, row 0 cols 0-2
         board.placeShip(0, 0, first, true);
 
-        Ship second = ShipFactory.createShip(2, "destructor"); // size 2, would overlap at (0,1)-(0,2)
+        Ship second = ShipFactory.createShip(2, "destructor"); // size 2, overlaps at (0,1)-(0,2)
         assertThrows(InvalidPositionException.class,
                 () -> board.placeShip(0, 1, second, true));
     }
@@ -85,22 +85,20 @@ class BoardTest {
     // ---------------------------------------------------------------
     // Bug: isValidPlacement called isShipOnCell(currentColumn, currentRow)
     // instead of isShipOnCell(currentRow, currentColumn). Because the board
-    // is square, this didn't throw an IndexOutOfBounds, but silently checked
-    // the wrong (transposed) cell. This meant that placing a ship near rows
-    // 0-2 could make later, completely unrelated placements be rejected
-    // (false positive) or, in other cases, allow real overlaps to slip
-    // through (false negative), because the check landed on a mirrored cell
-    // across the diagonal instead of the real target cell.
+    // is square, this didn't throw an IndexOutOfBoundsException, but silently
+    // checked the wrong (transposed) cell. This caused unrelated placements
+    // to be rejected (false positives) or real overlaps to be accepted
+    // (false negatives).
 
     @Test
-    @DisplayName("Colocar un barco en filas 0-2 no debe bloquear un barco no relacionado mas abajo")
+    @DisplayName("Placing a ship in the top rows should not block an unrelated ship below")
     void placingShipInTopRowsDoesNotBlockUnrelatedShipBelow() throws InvalidPositionException {
-        // Ship near the top-left corner, rows 0-2 (vertical, column 0)
-        Ship topShip = ShipFactory.createShip(1, "submarine"); // size 3
+
+        Ship topShip = ShipFactory.createShip(1, "submarine");
         board.placeShip(0, 0, topShip, false); // occupies (0,0) (1,0) (2,0)
 
-        // Completely unrelated ship, far from the first one.
-        Ship otherShip = ShipFactory.createShip(2, "destructor"); // size 2
+        Ship otherShip = ShipFactory.createShip(2, "destructor");
+
         assertDoesNotThrow(() -> board.placeShip(5, 5, otherShip, true));
 
         assertEquals(Board.SHIP, board.getStateOfCell(5, 5));
@@ -108,52 +106,54 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("La transposicion de una celda no debe generar falso solapamiento")
+    @DisplayName("A transposed cell must not cause a false overlap")
     void transposedCellDoesNotCauseFalseOverlap() throws InvalidPositionException {
-        // Place a ship at (1, 0)-(1,1) horizontal (size 2).
+
         Ship shipA = ShipFactory.createShip(1, "destructor");
         board.placeShip(1, 0, shipA, true); // occupies (1,0) and (1,1)
 
-        // With the old bug, checking cell (0,1) [row=0, col=1] would have
-        // consulted board.get(1).get(0) (transposed), which IS occupied by
-        // shipA, causing a false "already a ship" rejection here even
-        // though (0,1) is actually free.
-        Ship shipB = ShipFactory.createShip(2, "frigate"); // size 1
+        // With the old bug, checking (0,1) incorrectly inspected (1,0),
+        // causing a false overlap detection.
+        Ship shipB = ShipFactory.createShip(2, "frigate");
+
         assertDoesNotThrow(() -> board.placeShip(0, 1, shipB, true));
         assertEquals(Board.SHIP, board.getStateOfCell(0, 1));
     }
 
     @Test
-    @DisplayName("Un solapamiento real en la franja de filas 0-2 sigue siendo detectado")
+    @DisplayName("A real overlap near the top rows is still detected")
     void realOverlapNearTopRowsIsStillDetected() throws InvalidPositionException {
-        Ship shipA = ShipFactory.createShip(1, "submarine"); // size 3, vertical at col 2
+
+        Ship shipA = ShipFactory.createShip(1, "submarine");
         board.placeShip(0, 2, shipA, false); // occupies (0,2) (1,2) (2,2)
 
-        Ship shipB = ShipFactory.createShip(2, "destructor"); // size 2, horizontal, would hit (1,1)-(1,2)
+        Ship shipB = ShipFactory.createShip(2, "destructor");
+
         assertThrows(InvalidPositionException.class,
                 () -> board.placeShip(1, 1, shipB, true));
     }
 
     // ---------------------------------------------------------------
-    // isValidPlacement direct checks (package-private, same package)
+    // isValidPlacement direct checks
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("isValidPlacement devuelve true para una posicion libre valida")
+    @DisplayName("isValidPlacement returns true for a valid free position")
     void isValidPlacementReturnsTrueForFreeSpot() {
         assertTrue(board.isValidPlacement(4, 4, 3, true));
     }
 
     @Test
-    @DisplayName("isValidPlacement devuelve false cuando se sale del tablero")
+    @DisplayName("isValidPlacement returns false when the ship goes off the board")
     void isValidPlacementReturnsFalseWhenOffBoard() {
         assertFalse(board.isValidPlacement(9, 9, 2, true));
         assertFalse(board.isValidPlacement(9, 9, 2, false));
     }
 
     @Test
-    @DisplayName("isValidPlacement devuelve false cuando hay solapamiento real")
+    @DisplayName("isValidPlacement returns false when ships overlap")
     void isValidPlacementReturnsFalseOnRealOverlap() throws InvalidPositionException {
+
         Ship ship = ShipFactory.createShip(1, "submarine");
         board.placeShip(3, 3, ship, true); // occupies (3,3)-(3,5)
 

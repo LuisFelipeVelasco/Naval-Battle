@@ -35,22 +35,66 @@ import java.io.IOException;
  * machine's own (random) placement and switching to the play view.
  */
 public class PlacementController {
-    private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
-    static {
-        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/Images/carrier.png")));
-        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/Images/submarine.png")));
-        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/Images/destructor.png")));
-        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/Images/frigate.png")));
-    }
-    private static final double CELL_SIZE = 35;
-    private static final double GAP = 2;
-    @FXML private GridPane boardGrid;
-    @FXML private ListView<Ship> pendingShipsListView;
-    @FXML private Button rotateButton;
 
-    @FXML private Button startMatchButton;
+    /**
+     * Map that stores ship type images for visual representation on the board.
+     */
+    private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
+
+    static {
+        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/cards/carrier.png")));
+        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/cards/submarine.png")));
+        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/cards/destructor.png")));
+        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/cards/frigate.png")));
+    }
+
+    /**
+     * The size of each cell in pixels.
+     */
+    private static final double CELL_SIZE = 35;
+
+    /**
+     * The gap between cells in pixels.
+     */
+    private static final double GAP = 2;
+
+    /**
+     * Grid pane that represents the game board.
+     */
+    @FXML
+    private GridPane boardGrid;
+
+    /**
+     * List view that displays ships pending placement.
+     */
+    @FXML
+    private ListView<Ship> pendingShipsListView;
+
+    /**
+     * Button to rotate the ship orientation.
+     */
+    @FXML
+    private Button rotateButton;
+
+    /**
+     * Button to start the match after all ships are placed.
+     */
+    @FXML
+    private Button startMatchButton;
+
+    /**
+     * The game model instance.
+     */
     Game gameModel;
+
+    /**
+     * Flag indicating whether the current orientation is horizontal.
+     */
     private boolean horizontal = true;
+
+    /**
+     * The size of the game board (10x10).
+     */
     private static final int SIZE = 10;
 
     /**
@@ -62,7 +106,6 @@ public class PlacementController {
     private void initialize(){
         createCells();
         startMatchButton.setDisable(true);
-
     }
 
     /**
@@ -72,10 +115,11 @@ public class PlacementController {
      * that still needs to be placed.
      *
      * @param game the game model created by {@link StartController}
+     * @param playerName the name of the human player
      */
-    public void initGame(Game game){
+    public void initGame(Game game, String playerName){
         this.gameModel = game;
-        game.startPlacement();
+        gameModel.startPlacement(playerName);
         pendingShipsListView.setItems(FXCollections.observableArrayList(gameModel.getPlayerHuman().getShips()));
         setDragFromListView();
     }
@@ -103,6 +147,7 @@ public class PlacementController {
             }
         }
     }
+
     /**
      * Enables dragging a ship out of the pending ships list view. The
      * currently selected ship's type is stored on the {@link Dragboard}
@@ -141,8 +186,8 @@ public class PlacementController {
      */
     @FXML
     private void onStartMatchButton(ActionEvent event){
-        changePlayGameView(event);
         gameModel.startMatch();
+        changePlayGameView(event);
     }
 
     /**
@@ -188,13 +233,15 @@ public class PlacementController {
         event.setDropCompleted(true);
         event.consume();
     }
+
     /**
-     * Displays an error message to the user. (Not yet implemented.)
+     * Displays an error message to the user in a simple alert dialog.
+     * (Currently not implemented - placeholder for future enhancement.)
      *
      * @param message the error message to display
      */
     private void showError(String message){
-        // Alert simple o Label
+        // Alert simple o Label / Simple alert or Label
     }
 
     /**
@@ -219,7 +266,7 @@ public class PlacementController {
      * Builds the 2D figure used to represent a ship on the board: a
      * rounded rectangle for the hull, plus a smaller centered rectangle
      * ("tower") for ships of size 2 or more, so that they can be visually
-     * distinguished from a single-cell frigata.
+     * distinguished from a single-cell frigate.
      *
      * @param ship       the ship to build a figure for
      * @param horizontal {@code true} to build a horizontal figure, {@code false} for vertical
@@ -240,14 +287,13 @@ public class PlacementController {
         Node shipNode = imageView;
         if (!horizontal){
             imageView.setRotate(90);
-            shipNode = new Group(imageView); 
+            shipNode = new Group(imageView);
         }
 
         StackPane container = new StackPane(shipNode);
         container.setPickOnBounds(false);
         return container;
     }
-
 
     /**
      * Switches the current scene to the play view, passing the shared
@@ -257,24 +303,27 @@ public class PlacementController {
      * @param event the action event used to obtain the current stage
      */
     private void changePlayGameView(ActionEvent event){
-        try {
-            gameModel.startMatch();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
+        try{
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
+
             Parent root = loader.load();
 
             PlayController controller = loader.getController();
-            gameModel.startMatch();
+
             controller.setGameModel(gameModel);
+
             controller.loadBoard();
 
+            Stage stage =
+                    (Stage)((Node)event.getSource()).getScene().getWindow();
 
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
+
             stage.show();
 
-        } catch (IOException e){
-            showError("Dont possible to load the view: " + e.getMessage());
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 }
