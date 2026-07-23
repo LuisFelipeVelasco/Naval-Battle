@@ -1,4 +1,5 @@
 package com.examplez.demo.controller;
+import javafx.animation.PauseTransition;
 import javafx.scene.shape.Rectangle;
 import com.examplez.demo.model.Board;
 import com.examplez.demo.model.Cell;
@@ -7,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
+
 import java.util.List;
 
 /**
@@ -44,7 +47,6 @@ public class PlayController {
      */
     public void setGameModel(Game gameModel){
         this.gameModel = gameModel;
-
     }
 
     /**
@@ -88,7 +90,13 @@ public class PlayController {
         Board machineBoard = gameModel.getPlayerMachine().getBoard();
         if (machineBoard.isCellAlreadyAttacked(row, column)) return;
         machineBoard.attackCell(row, column);
+
         String result=machineBoard.getStateOfCell(row,column);
+        if (result.equals(Board.HIT)&&  machineBoard.isShipSunken(row,column)){
+            machineBoard.sinkShip(row,column);
+            result=Board.SUNKEN;
+
+        }
         drawMainBoard();
 
         if (!machineBoard.isBoardWithShips()){
@@ -98,7 +106,7 @@ public class PlayController {
 
         if (result.equals(Board.WATER)){
             playerTurn = false;
-           // machineTurn();
+           machineTurnLoop();
         }
         // if HIT or SUNKED, the player keeps shooting (nothing else to do)
     }
@@ -169,6 +177,31 @@ public class PlayController {
             }
         }
     }
+
+
+    private void machineTurnLoop(){
+    PauseTransition pause = new PauseTransition(Duration.millis(600));
+    pause.setOnFinished(event -> {
+        gameModel.processMachineAttack(); // sigue siendo void, sin tocarla
+        drawPositionBoard();
+
+        Board humanBoard = gameModel.getPlayerHuman().getBoard();
+
+        if (!humanBoard.isBoardWithShips()){
+            showWinner("Machine");
+            return;
+        }
+
+        String lastResult = humanBoard.getStateLastCellAttacked();
+        if (lastResult.equals(Board.WATER)){
+            playerTurn = true; // se devuelve el turno al jugador
+        } else {
+            machineTurnLoop(); // la máquina sigue disparando (HIT o SUNKEN)
+        }
+    });
+    pause.play();
+}
+
 
 
 }

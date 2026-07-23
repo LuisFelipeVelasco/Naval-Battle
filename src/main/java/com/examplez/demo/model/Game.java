@@ -29,14 +29,14 @@ public class Game {
     /**
      * Creates the machine player and assigns it to this game.
      */
-    void createMachinePlayer(){
+   public void createMachinePlayer(){
         this.playerMachine = new PlayerMachine(createShipLIst());
     }
 
     /**
      * Creates the human player and assigns it to this game.
      */
-    void createHumanPlayer(){
+   public void createHumanPlayer(){
         this.playerHuman = new PlayerHuman(createShipLIst());
     }
 
@@ -69,11 +69,11 @@ public class Game {
      * sink the ship if is possible
      * register the hit on the ship
      * */
-    void processMachineAttack(){
+   public void processMachineAttack(){
         Random random= new Random();
         List<List<Integer>> validCellsToAttack = new ArrayList<>(List.of());
-        for(int i=0; i<=sizeBoard;i++){
-            for(int j=0; j<=sizeBoard; j++){
+        for(int i=0; i<sizeBoard;i++){
+            for(int j=0; j<sizeBoard; j++){
                 if(isCellValidToAttack(playerHuman,i,j)){
                     validCellsToAttack.add(List.of(i,j));
                 }
@@ -85,7 +85,6 @@ public class Game {
         Board humanBoard= playerHuman.getBoard();
         humanBoard.attackCell(rowCellToAttack,columnCellToAttack);
         if(humanBoard.isShipOnCell(rowCellToAttack,columnCellToAttack)){
-            humanBoard.attackCell(rowCellToAttack,columnCellToAttack);
             if (humanBoard.isShipSunken(rowCellToAttack,columnCellToAttack)){
                 humanBoard.sinkShip(rowCellToAttack,columnCellToAttack);
             }

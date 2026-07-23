@@ -39,6 +39,7 @@ public abstract  class Player {
         for(Ship ship:ships){
             if(shipSelected==ship){
                 ships.remove(shipSelected);
+                break;
             }
         }
         board.placeShip(row,column,shipSelected,horizontal);
@@ -49,8 +50,11 @@ public abstract  class Player {
      * @return {@code  true} when the list of ships doesn't have ships
      */
     public boolean isFleetFullyPlaced(){
+        System.out.println(ships.size());
         return ships.isEmpty();
     }
+/*
 
+ */
 
 }

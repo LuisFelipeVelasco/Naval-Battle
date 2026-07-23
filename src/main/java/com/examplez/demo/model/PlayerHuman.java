@@ -12,7 +12,6 @@ public class PlayerHuman extends Player{
     /**
      * Places a ship on this player's board at the given position and
      * orientation.
-     *
      * @param row        starting row index
      * @param column     starting column index
      * @param ship       the ship to place

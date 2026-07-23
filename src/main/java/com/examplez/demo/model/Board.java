@@ -23,6 +23,8 @@ public class Board {
     /** State of a cell that was shot at and hit part of a ship that has been sunk. */
     public static final String SUNKEN = "sunken";
 
+    private List<Integer> positionLastCellAttacked;
+
     /**
      * Creates a new empty 10x10 board.
      * Every cell starts in the {@link #BLANK} state, with no ship assigned.
@@ -75,11 +77,10 @@ public class Board {
         for (int i = 0; i < size; i++){
             int currentRow = horizontal ? row : row + i;
             int currentColumn = horizontal ? column + i : column;
-
             if (currentRow >= SizeList || currentColumn >= SizeList){
                 return false; // it goes off from the board
             }
-            if (isShipOnCell(currentColumn, currentRow)){
+            if (isShipOnCell(currentRow, currentColumn)){
                 return false; // there is already a ship on that position
             }
         }
@@ -97,7 +98,6 @@ public class Board {
      * @throws InvalidPositionException if the placement goes off the board or overlaps another ship
      */
     public void placeShip(int row, int column, Ship ship, boolean horizontal) throws InvalidPositionException {
-
         if (!isValidPlacement(row, column, ship.getSize(), horizontal)){
             throw new InvalidPositionException(row, column);
         }
@@ -111,7 +111,7 @@ public class Board {
         }
     }
     /**
-     * change the state of the cell chosen to attacked
+     * change the state of the cell chosen to attacked and modify positionLastCellAttacked
      * @param row row of cell chosen
      * @param column column of cell chosen
      */
@@ -121,6 +121,7 @@ public class Board {
             throw new AlreadyAttackedException(row, column);
         }
         Cell cellAttacked= board.get(row).get(column);
+        positionLastCellAttacked=List.of(row,column);
         if(cellAttacked.getShip()==null){
             cellAttacked.setState(WATER);
             return;
@@ -132,7 +133,7 @@ public class Board {
      * @param column column of cell chosen to verify
      * @return {@code false} when at least one cell with the ship is no attacked
      */
-    boolean isShipSunken(int row , int column){
+    public boolean isShipSunken(int row , int column){
         int idOfShip = getIdOfShipOnCell(row,column);
         for(int i=0;i<SizeList;i++){
             for(int j=0;j<SizeList;j++){
@@ -161,11 +162,12 @@ public class Board {
         }
         return false;
     }
+
     /**change the state of the cell chosen for sunken
      * @param row row of cell chosen
      * @param column column of cell
      */
-    void sinkShip(int row , int column){
+   public void sinkShip(int row , int column){
         int idOfShip = getIdOfShipOnCell(row,column);
         for(int i=0;i<SizeList;i++){
             for(int j=0;j<SizeList;j++){
@@ -201,5 +203,14 @@ public class Board {
 
     public List<List<Cell>>  getCells(){
         return board;
+    }
+
+    /**@return the position of the last cell attacked*/
+    public List<Integer> getPositionLastCellAttacked(){return positionLastCellAttacked;}
+    /**@return state of the last cell attacked*/
+    public String getStateLastCellAttacked(){
+        int row = positionLastCellAttacked.get(0);
+        int column= positionLastCellAttacked.get(1);
+        return getStateOfCell(row,column);
     }
 }

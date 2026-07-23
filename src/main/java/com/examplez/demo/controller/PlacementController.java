@@ -39,7 +39,6 @@ public class PlacementController {
 
     @FXML private Button startMatchButton;
     Game gameModel;
-    private PlayerHuman playerHuman;
     private boolean horizontal = true;
     private static final int SIZE = 10;
 
@@ -132,6 +131,7 @@ public class PlacementController {
     @FXML
     private void onStartMatchButton(ActionEvent event){
         changePlayGameView(event);
+        gameModel.startMatch();
     }
 
     /**
@@ -160,6 +160,7 @@ public class PlacementController {
      */
     private void onDragDropped(DragEvent event, int row, int column){
         Ship shipSelected = pendingShipsListView.getSelectionModel().getSelectedItem();
+        PlayerHuman playerHuman= gameModel.getPlayerHuman();
 
         if (shipSelected != null){
             try {
@@ -196,7 +197,6 @@ public class PlacementController {
      */
     private void drawShip(Ship ship, int row, int column){
         Node ShipFigure = createShipShape(ship, horizontal);
-
         GridPane.setColumnIndex(ShipFigure, column);
         GridPane.setRowIndex(ShipFigure, row);
         GridPane.setColumnSpan(ShipFigure, horizontal ? ship.getSize() : 1);
@@ -252,14 +252,6 @@ public class PlacementController {
 
 
     /**
-     * Reserved for a possible threaded ship-selection mechanism.
-     * (Not yet implemented.)
-     */
-    private void createThreadOfShips(){
-
-    }
-
-    /**
      * Switches the current scene to the play view, passing the shared
      * game model (with both fleets already placed) to the new
      * {@link PlayController}.
@@ -272,8 +264,10 @@ public class PlacementController {
             Parent root = loader.load();
 
             PlayController controller = loader.getController();
+            gameModel.startMatch();
             controller.setGameModel(gameModel);
             controller.loadBoard();
+            gameModel.startMatch();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -282,12 +276,5 @@ public class PlacementController {
         } catch (IOException e){
             showError("Dont possible to load the view: " + e.getMessage());
         }
-    }
-    /**
-     * Shows the opponent's (machine's) board for verification purposes.
-     * (Not yet implemented.)
-     */
-    private void showBoard(){
-
     }
 }
