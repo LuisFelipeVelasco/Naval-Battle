@@ -15,9 +15,10 @@ public class GameLauncher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(GameLauncher.class.getResource("menu-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(fxmlLoader.load(), 1100, 720);
+        stage.setTitle("menu");
         stage.setScene(scene);
+        stage.centerOnScreen();
         stage.show();
     }
 }

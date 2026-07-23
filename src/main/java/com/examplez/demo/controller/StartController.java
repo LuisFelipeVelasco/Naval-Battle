@@ -42,14 +42,16 @@ public class StartController {
      * @throws IOException if the placement view FXML cannot be loaded
      */
     private void changeGameView(ActionEvent event) throws IOException {
-        String fxml = "/com/examplez/demo/PlaceShips-View.fxml";
+        String fxml = "/com/examplez/demo/place-ships-View.fxml";
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
         Parent root = loader.load();
         PlacementController controller = loader.getController();
         Game newGame = new Game();
         controller.initGame(newGame);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root));
+        stage.setScene(new Scene(root,860,650));
+        stage.centerOnScreen();
+        stage.setTitle("placement");
         stage.show();
     }
 }

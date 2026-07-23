@@ -86,20 +86,20 @@ public class PlacementController {
      * that ships can be dropped on them.
      */
     private void createCells(){
-        for (int fila = 0; fila < SIZE; fila++){
-            for (int columna = 0; columna < SIZE; columna++){
-                StackPane celdaVisual = new StackPane();
-                Rectangle fondo = new Rectangle(35, 35);
-                fondo.setFill(Color.LIGHTBLUE);
-                fondo.setStroke(Color.GRAY);
-                celdaVisual.getChildren().add(fondo);
+        for (int row = 0; row < SIZE; row++){
+            for (int column = 0; column < SIZE; column++){
+                StackPane visualCell = new StackPane();
+                Rectangle background = new Rectangle(35, 35);
+                background.setFill(Color.LIGHTBLUE);
+                background.setStroke(Color.GRAY);
+                visualCell.getChildren().add(background);
 
-                final int f = fila;
-                final int c = columna;
-                celdaVisual.setOnDragOver(this::onDragOver);
-                celdaVisual.setOnDragDropped(evento -> onDragDropped(evento, f, c));
+                final int f = row;
+                final int c = column;
+                visualCell.setOnDragOver(this::onDragOver);
+                visualCell.setOnDragDropped(event -> onDragDropped(event, f, c));
 
-                boardGrid.add(celdaVisual, columna, fila);
+                boardGrid.add(visualCell, column, row);
             }
         }
     }
@@ -178,7 +178,6 @@ public class PlacementController {
                 playerHuman.placeShipOnBoard(row, column, shipSelected, horizontal);
                 drawShip(shipSelected, row, column);
                 pendingShipsListView.getItems().remove(shipSelected);
-
                 if (playerHuman.isFleetFullyPlaced()){
                     startMatchButton.setDisable(false);
                 }
@@ -241,7 +240,7 @@ public class PlacementController {
         Node shipNode = imageView;
         if (!horizontal){
             imageView.setRotate(90);
-            shipNode = new Group(imageView); // Group recalcula el bounding box ya rotado
+            shipNode = new Group(imageView); 
         }
 
         StackPane container = new StackPane(shipNode);
