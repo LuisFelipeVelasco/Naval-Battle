@@ -35,12 +35,13 @@ import java.io.IOException;
  * machine's own (random) placement and switching to the play view.
  */
 public class PlacementController {
+
     private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
     static {
-        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/Images/carrier.png")));
-        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/Images/submarine.png")));
-        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/Images/destructor.png")));
-        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/Images/frigate.png")));
+        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/cards/carrier.png")));
+        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/cards/submarine.png")));
+        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/cards/destructor.png")));
+        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/cards/frigate.png")));
     }
     private static final double CELL_SIZE = 35;
     private static final double GAP = 2;
@@ -50,6 +51,8 @@ public class PlacementController {
 
     @FXML private Button startMatchButton;
     Game gameModel;
+
+
     private boolean horizontal = true;
     private static final int SIZE = 10;
 
@@ -73,11 +76,12 @@ public class PlacementController {
      *
      * @param game the game model created by {@link StartController}
      */
-    public void initGame(Game game){
+    public void initGame(Game game, String playerName){
         this.gameModel = game;
-        game.startPlacement();
+        gameModel.startPlacement(playerName);
         pendingShipsListView.setItems(FXCollections.observableArrayList(gameModel.getPlayerHuman().getShips()));
         setDragFromListView();
+
     }
 
     /**
@@ -86,20 +90,20 @@ public class PlacementController {
      * that ships can be dropped on them.
      */
     private void createCells(){
-        for (int fila = 0; fila < SIZE; fila++){
-            for (int columna = 0; columna < SIZE; columna++){
-                StackPane celdaVisual = new StackPane();
-                Rectangle fondo = new Rectangle(35, 35);
-                fondo.setFill(Color.LIGHTBLUE);
-                fondo.setStroke(Color.GRAY);
-                celdaVisual.getChildren().add(fondo);
+        for (int row = 0; row < SIZE; row++){
+            for (int column = 0; column < SIZE; column++){
+                StackPane visualCell = new StackPane();
+                Rectangle background = new Rectangle(35, 35);
+                background.setFill(Color.LIGHTBLUE);
+                background.setStroke(Color.GRAY);
+                visualCell.getChildren().add(background);
 
-                final int f = fila;
-                final int c = columna;
-                celdaVisual.setOnDragOver(this::onDragOver);
-                celdaVisual.setOnDragDropped(evento -> onDragDropped(evento, f, c));
+                final int f = row;
+                final int c = column;
+                visualCell.setOnDragOver(this::onDragOver);
+                visualCell.setOnDragDropped(event -> onDragDropped(event, f, c));
 
-                boardGrid.add(celdaVisual, columna, fila);
+                boardGrid.add(visualCell, column, row);
             }
         }
     }
@@ -141,8 +145,8 @@ public class PlacementController {
      */
     @FXML
     private void onStartMatchButton(ActionEvent event){
-        changePlayGameView(event);
         gameModel.startMatch();
+        changePlayGameView(event);
     }
 
     /**
@@ -178,7 +182,6 @@ public class PlacementController {
                 playerHuman.placeShipOnBoard(row, column, shipSelected, horizontal);
                 drawShip(shipSelected, row, column);
                 pendingShipsListView.getItems().remove(shipSelected);
-
                 if (playerHuman.isFleetFullyPlaced()){
                     startMatchButton.setDisable(false);
                 }
@@ -241,7 +244,7 @@ public class PlacementController {
         Node shipNode = imageView;
         if (!horizontal){
             imageView.setRotate(90);
-            shipNode = new Group(imageView); // Group recalcula el bounding box ya rotado
+            shipNode = new Group(imageView); 
         }
 
         StackPane container = new StackPane(shipNode);
@@ -258,24 +261,28 @@ public class PlacementController {
      * @param event the action event used to obtain the current stage
      */
     private void changePlayGameView(ActionEvent event){
-        try {
-            gameModel.startMatch();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
+        try{
+
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
+
             Parent root = loader.load();
 
             PlayController controller = loader.getController();
-            gameModel.startMatch();
+
             controller.setGameModel(gameModel);
+
             controller.loadBoard();
 
+            Stage stage =
+                    (Stage)((Node)event.getSource()).getScene().getWindow();
 
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
+
             stage.show();
 
-        } catch (IOException e){
-            showError("Dont possible to load the view: " + e.getMessage());
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 }

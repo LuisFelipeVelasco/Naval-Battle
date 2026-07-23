@@ -50,7 +50,7 @@ public abstract  class Player {
      * @return {@code  true} when the list of ships doesn't have ships
      */
     public boolean isFleetFullyPlaced(){
-        System.out.println(ships.size());
+
         return ships.isEmpty();
     }
 /*

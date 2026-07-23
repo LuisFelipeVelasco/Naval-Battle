@@ -30,6 +30,7 @@ public class PlayerMachine extends  Player{
     private void placeRandomShips(int sizeBoard){
         Random random= new Random();
         for (Ship ship: ships){
+
             boolean placed=false;
             while (!placed){
                 int row= random.nextInt(sizeBoard);
@@ -38,7 +39,10 @@ public class PlayerMachine extends  Player{
                 try {
                     board.placeShip(row,column,ship,horizontal);
                     placed=true;
+
                 }catch (InvalidPositionException e){
+
+
                     // it trys another position
                 }
             }

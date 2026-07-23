@@ -6,6 +6,14 @@ import java.util.List;
 
 /**Representation of the user */
 public class PlayerHuman extends Player{
+    public String playerName;
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    };
     PlayerHuman(List<Ship> ships){
         super(ships);
     }

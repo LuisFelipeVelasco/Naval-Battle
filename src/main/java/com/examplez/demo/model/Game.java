@@ -16,8 +16,11 @@ public class Game {
     /**size of the squared - board*/
     int sizeBoard=10;
 
-    public void startPlacement(){
+
+    public void startPlacement(String playerName){
+
         createHumanPlayer();
+        playerHuman.setPlayerName(playerName);
         playerHuman.createBoard(sizeBoard);
     }
 

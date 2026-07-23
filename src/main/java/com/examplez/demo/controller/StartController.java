@@ -8,6 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,18 +22,24 @@ import java.io.IOException;
  * ship placement view.
  */
 public class StartController {
+    @FXML
+    private TextField playerNameField;
 
     @FXML private Button InitialButton;
 
-    /**
-     * Handles the click on the initial button, starting a new game.
-     *
-     * @param event the action event fired by the button
-     * @throws IOException if the placement view FXML cannot be loaded
-     */
+
     @FXML
-    private void onMouseClicked(ActionEvent event) throws IOException {
+    public void handleStartGame(ActionEvent event) throws  IOException{
+
+        String playerName = playerNameField.getText().trim();
+        if (playerName.isEmpty()) {
+            InitialButton.setDisable(true);
+        }
         changeGameView(event);
+    }
+    @FXML
+    public void handleLoadGame(ActionEvent event) throws  IOException{
+
     }
 
     /**
@@ -44,14 +52,18 @@ public class StartController {
      * @throws IOException if the placement view FXML cannot be loaded
      */
     private void changeGameView(ActionEvent event) throws IOException {
-        String fxml = "/com/examplez/demo/PlaceShips-View.fxml";
+        String fxml = "/com/examplez/demo/place-ships-View.fxml";
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
         Parent root = loader.load();
         PlacementController controller = loader.getController();
         Game newGame = new Game();
-        controller.initGame(newGame);
+        String playerName = playerNameField.getText().trim();
+
+        controller.initGame(newGame,playerName);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root));
+        stage.setScene(new Scene(root,860,650));
+        stage.centerOnScreen();
+        stage.setTitle("placement");
         stage.show();
     }
 }
