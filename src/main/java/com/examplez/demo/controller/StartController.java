@@ -8,6 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,15 +23,44 @@ import java.io.IOException;
  */
 public class StartController {
 
-    @FXML private Button InitialButton;
-
+    /**
+     * Text field where the player enters their name.
+     */
     @FXML
-    public void handleStartGame(ActionEvent event) throws  IOException{
+    private TextField playerNameField;
+
+    /**
+     * Button that starts a new game.
+     */
+    @FXML
+    private Button InitialButton;
+
+    /**
+     * Handles the "Start Game" action. Validates that the player name is not empty,
+     * then transitions to the ship placement view with a new game.
+     *
+     * @param event the action event triggered by clicking the start button
+     * @throws IOException if the placement view FXML cannot be loaded
+     */
+    @FXML
+    public void handleStartGame(ActionEvent event) throws IOException {
+        String playerName = playerNameField.getText().trim();
+        if (playerName.isEmpty()) {
+            InitialButton.setDisable(true);
+        }else {
         changeGameView(event);
     }
-    @FXML
-    public void handleLoadGame(ActionEvent event) throws  IOException{
+    }
 
+    /**
+     * Handles the "Load Game" action. (Currently a placeholder for future implementation.)
+     *
+     * @param event the action event triggered by clicking the load button
+     * @throws IOException if an error occurs during the load process
+     */
+    @FXML
+    public void handleLoadGame(ActionEvent event) throws IOException {
+        // Not yet implemented
     }
 
     /**
@@ -47,9 +78,11 @@ public class StartController {
         Parent root = loader.load();
         PlacementController controller = loader.getController();
         Game newGame = new Game();
-        controller.initGame(newGame);
+        String playerName = playerNameField.getText().trim();
+
+        controller.initGame(newGame, playerName);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root,860,650));
+        stage.setScene(new Scene(root, 860, 650));
         stage.centerOnScreen();
         stage.setTitle("placement");
         stage.show();
