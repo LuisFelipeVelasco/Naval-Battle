@@ -29,6 +29,8 @@ public class Board implements Serializable {
     public static final String HIT = "hit";
     /** State of a cell that was shot at and hit part of a ship that has been sunk. */
     public static final String SUNKEN = "sunken";
+    /** Counter for ships sunk on this board. */
+    private int numberShipsSunk;
 
     private List<Integer> positionLastCellAttacked;
 
@@ -184,6 +186,7 @@ public class Board implements Serializable {
                 }
             }
         }
+       numberShipsSunk++;
     }
 
     /**
@@ -220,4 +223,11 @@ public class Board implements Serializable {
         int column= positionLastCellAttacked.get(1);
         return getStateOfCell(row,column);
     }
+
+    /**
+     * Gets the total number of ships sunk on this board.
+     *
+     * @return the number of sunk ships.
+     */
+    public int getNumberShipsSunk() { return numberShipsSunk; }
 }

@@ -5,7 +5,7 @@ import java.io.*;
 /**
  * Utility class responsible for managing persistent game storage operations.
  * Handles reading, writing, checking, and deleting serializable game states
- * and plain text turn records.
+ * and text-based game statistics (turn, ships sunk, and player nickname).
  *
  * <p>This class cannot be instantiated.</p>
  */
@@ -14,8 +14,8 @@ public class GameFileManager {
     /** Path to the file storing the serialized {@link GameState} object. */
     private static final String SERIALIZED_FILE = "lastGamingSession.ser";
 
-    /** Path to the text file storing the current turn number. */
-    private static final String TURN_FILE = "lastTurnGame.txt";
+    /** Path to the text file storing game statistics (turn, ships sunk, nickname). */
+    private static final String STATISTICS_FILE = "lastStatisticsGame.txt";
 
     /**
      * Private constructor to prevent instantiation of this utility class.
@@ -27,13 +27,16 @@ public class GameFileManager {
     }
 
     /**
-     * Saves the current state of the game and the current turn number to disk.
+     * Saves the current state of the game, the active turn,ships sunk count,
+     * and human player's nickname to persistent storage.
      *
-     * @param state the {@link GameState} that will be serialized.
-     * @param currentTurn the integer representing the active turn number.
-     * @throws GameSaveException if an I/O error occurs while writing to the files.
+     * @param state                the {@link GameState} to be serialized.
+     * @param currentTurn          the integer representing the active turn number.
+     * @param shipsSunkPlayerHuman the number of ships sunk by the human player.
+     * @param nicknamePlayerHuman  the nickname of the human player.
+     * @throws GameSaveException   if an I/O error occurs while writing to disk.
      */
-    public static void saveGame(GameState state, int currentTurn) {
+    public static void saveGame(GameState state, int currentTurn, int shipsSunkPlayerHuman, String nicknamePlayerHuman) {
 
         // Save the state of Game into a serializable file
         try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(SERIALIZED_FILE))) {
@@ -42,12 +45,13 @@ public class GameFileManager {
             throw new GameSaveException("Error writing game state to file.", e);
         }
 
-        // Save the current turn into a text file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TURN_FILE, false))) {
-            writer.write(String.valueOf(currentTurn));
+        // Save current statistics formatted as CSV (turn,shipsSunk,nickname)
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STATISTICS_FILE, false))) {
+            String dataLine = String.format("%d,%d,%s", currentTurn, shipsSunkPlayerHuman, nicknamePlayerHuman);
+            writer.write(dataLine);
             writer.newLine();
         } catch (IOException e) {
-            throw new GameSaveException("Error writing current turn to file.", e);
+            throw new GameSaveException("Error writing game statistics to file.", e);
         }
     }
 
@@ -79,31 +83,82 @@ public class GameFileManager {
      * @throws GameLoadException if no saved record exists, or if the turn data cannot be read or parsed.
      */
     public static int loadTurn() {
-        if (!isAGameSaved()) {
-            throw new GameLoadException("No previous saved game record exists.", null);
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(TURN_FILE))) {
-            String line = reader.readLine();
-            return Integer.parseInt(line.trim());
-        } catch (IOException | NumberFormatException e) {
-            throw new GameLoadException("Unable to read or parse the saved turn number.", e);
+        String[] data = readStatisticsData();
+        try {
+            return Integer.parseInt(data[0].trim());
+        } catch (NumberFormatException e) {
+            throw new GameLoadException("Unable to parse the saved turn number.", e);
         }
     }
 
     /**
-     * Deletes the serialized state file and the text turn record file from the system,
-     * removing the saved game session.
+     * Reads and returns the human player's nickname from the saved statistics file.
+     *
+     * @return the saved player nickname as a {@String}.
+     * @throws GameLoadException if no saved record exists or if data is corrupt.
+     */
+    public static String loadNicknamePlayerHuman() {
+        String[] data = readStatisticsData();
+        return data[2].trim();
+    }
+
+    /**
+     * Reads and returns the number of ships sunk by the human player from the saved statistics file.
+     *
+     * @return the number of sunk ships as an integer.
+     * @throws GameLoadException if no saved record exists or if the value cannot be parsed.
+     */
+    public static int loadNumberShipsSunkPlayerHuman() {
+        String[] data = readStatisticsData();
+        try {
+            return Integer.parseInt(data[1].trim());
+        } catch (NumberFormatException e) {
+            throw new GameLoadException("Unable to parse the human player's sunk ships count.", e);
+        }
+    }
+
+    /**
+     * Private helper method that reads the statistics file and splits the CSV line into tokens.
+     * Centralizes reading logic and exception handling.
+     *
+     * @return an array of {@String} containing the split values: [turn, shipsSunk, nickname].
+     * @throws GameLoadException if the file is missing, empty, or improperly formatted.
+     */
+    private static String[] readStatisticsData() {
+        if (!isAGameSaved()) {
+            throw new GameLoadException("No previous saved game record exists.", null);
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(STATISTICS_FILE))) {
+            String line = reader.readLine();
+            if (line == null || line.isBlank()) {
+                throw new GameLoadException("The statistics file is empty or corrupted.", null);
+            }
+
+            String[] tokens = line.split(",", -1);
+            if (tokens.length < 3) {
+                throw new GameLoadException("Corrupted statistics file structure.", null);
+            }
+
+            return tokens;
+
+        } catch (IOException e) {
+            throw new GameLoadException("Unable to read the saved game statistics file.", e);
+        }
+    }
+
+    /**
+     * Deletes the serialized state file and the text statistics file from disk.
      */
     public static void deleteGame() {
         File savedGame = new File(SERIALIZED_FILE);
-        File lastCurrentTurn = new File(TURN_FILE);
+        File statisticsFile = new File(STATISTICS_FILE);
 
         if (savedGame.exists()) {
             savedGame.delete();
         }
-        if (lastCurrentTurn.exists()) {
-            lastCurrentTurn.delete();
+        if (statisticsFile.exists()) {
+            statisticsFile.delete();
         }
     }
 
@@ -114,7 +169,7 @@ public class GameFileManager {
      */
     public static boolean isAGameSaved() {
         File savedGame = new File(SERIALIZED_FILE);
-        File lastCurrentTurn = new File(TURN_FILE);
-        return savedGame.exists() && lastCurrentTurn.exists();
+        File statisticsFile = new File(STATISTICS_FILE);
+        return savedGame.exists() && statisticsFile.exists();
     }
 }
