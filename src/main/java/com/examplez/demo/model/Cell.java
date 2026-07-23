@@ -61,7 +61,7 @@ public class Cell {
      * @return the id's ship, or {@code null} if the cell is empty
      */
     public int getIdOfShip(){
-        return ship.getId();
+        return (ship != null) ? ship.getId() : -1;
     }
 
     /**

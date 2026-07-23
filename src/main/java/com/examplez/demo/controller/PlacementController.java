@@ -260,6 +260,7 @@ public class PlacementController {
      */
     private void changePlayGameView(ActionEvent event){
         try {
+            gameModel.startMatch();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
             Parent root = loader.load();
 
@@ -267,7 +268,8 @@ public class PlacementController {
             gameModel.startMatch();
             controller.setGameModel(gameModel);
             controller.loadBoard();
-            gameModel.startMatch();
+
+
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
