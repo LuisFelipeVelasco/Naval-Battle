@@ -1,24 +1,60 @@
 package com.examplez.demo.model;
 
+import com.examplez.demo.model.exceptions.InvalidPositionException;
+
 import java.util.List;
 
 /**Represents any player on the game*/
-public class Player {
+public abstract  class Player {
+    protected List<Ship> ships;
     /**Board of the player on the game*/
     Board board;
-    /**List with the ships of the player*/
-    List<Ship> ships;
+    Player(List<Ship> ships){
+        this.ships=ships;
+    }
     /**@return board of the player*/
-    Board getBoard(){return board;}
+    public Board getBoard(){return board;}
+
+    /**@return ships of the player*/
+    public List<Ship> getShips(){return ships;}
+
     /**
-     * attack a ship by its id
-     * @param idOfShip id of the ship that is gonna receive the attack
+     * Creates this player's board and fleet. Each subclass implements
+     * this differently: a human player starts with an empty board ready
+     * for manual placement, while the machine player places its fleet
+     * randomly right away.
+     * @param sizeBoard width and height of the board
      */
-    void  receiveAttackOnShip(int idOfShip){
-        for(Ship ship: ships){
-            if (ship.getId()==idOfShip){
-                ship.increaseHitOnShip();
+    public abstract void createBoard(int sizeBoard);
+
+    /**
+     * Take a ship out from the list of ships to the board of the player
+     * @param row row chosen
+     * @param column column chosen
+     * @param shipSelected ship chosen
+     * @param horizontal orientation chosen
+     * @throws InvalidPositionException when the position isn't valid
+     */
+    public void placeShipOnBoard(int row, int column,Ship shipSelected,boolean horizontal) throws InvalidPositionException {
+        for(Ship ship:ships){
+            if(shipSelected==ship){
+                ships.remove(shipSelected);
+                break;
             }
         }
+        board.placeShip(row,column,shipSelected,horizontal);
     }
+
+    /**
+     * Verify if the player placed all the ships
+     * @return {@code  true} when the list of ships doesn't have ships
+     */
+    public boolean isFleetFullyPlaced(){
+        System.out.println(ships.size());
+        return ships.isEmpty();
+    }
+/*
+
+ */
+
 }
