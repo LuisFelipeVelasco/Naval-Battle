@@ -23,15 +23,13 @@ public class StartController {
 
     @FXML private Button InitialButton;
 
-    /**
-     * Handles the click on the initial button, starting a new game.
-     *
-     * @param event the action event fired by the button
-     * @throws IOException if the placement view FXML cannot be loaded
-     */
     @FXML
-    private void onMouseClicked(ActionEvent event) throws IOException {
+    public void handleStartGame(ActionEvent event) throws  IOException{
         changeGameView(event);
+    }
+    @FXML
+    public void handleLoadGame(ActionEvent event) throws  IOException{
+
     }
 
     /**

@@ -1,0 +1,278 @@
+/* ================================================================
+   NAVAL BATTLE — START SCREEN
+   Keep this file beside start-view.fxml and naval-battle-space.png.
+   ================================================================ */
+
+.screen-root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #020712;
+    -fx-background-image: url("naval-battle-space.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+
+.space-vignette {
+    -fx-background-color:
+        radial-gradient(center 50% 46%, radius 64%,
+            rgba(5, 14, 30, 0.10) 0%,
+            rgba(1, 5, 14, 0.56) 74%,
+            rgba(0, 2, 8, 0.91) 100%),
+        linear-gradient(to bottom,
+            rgba(1, 5, 14, 0.28) 0%,
+            rgba(1, 5, 14, 0.02) 34%,
+            rgba(1, 5, 14, 0.48) 100%);
+}
+
+.screen-shell {
+    -fx-background-color: transparent;
+}
+
+/* ---------- Status bar ---------- */
+
+.top-status-bar {
+    -fx-border-color: transparent transparent rgba(102, 220, 255, 0.15) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.status-dot {
+    -fx-background-color: #53e6ff;
+    -fx-background-radius: 99;
+    -fx-effect: dropshadow(gaussian, rgba(83, 230, 255, 0.92), 9, 0.55, 0, 0);
+}
+
+.status-label,
+.online-label,
+.footer-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.status-label {
+    -fx-text-fill: rgba(205, 230, 244, 0.76);
+}
+
+.online-label {
+    -fx-text-fill: #74e7bd;
+    -fx-effect: dropshadow(gaussian, rgba(76, 226, 174, 0.32), 5, 0.35, 0, 0);
+}
+
+/* ---------- Hero title ---------- */
+
+.title-block {
+    -fx-padding: 0 0 2 0;
+}
+
+.eyebrow {
+    -fx-text-fill: #70ddf4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.game-title {
+    -fx-text-fill: #f2fbff;
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(74, 220, 255, 0.80), 18, 0.30, 0, 2);
+}
+
+.title-line-left {
+    -fx-background-color: linear-gradient(to right,
+        rgba(76, 220, 255, 0.0), rgba(76, 220, 255, 0.85));
+}
+
+.title-line-right {
+    -fx-background-color: linear-gradient(to right,
+        rgba(76, 220, 255, 0.85), rgba(76, 220, 255, 0.0));
+}
+
+.title-diamond {
+    -fx-background-color: #59ddf7;
+    -fx-rotate: 45;
+    -fx-effect: dropshadow(gaussian, rgba(89, 221, 247, 0.9), 7, 0.45, 0, 0);
+}
+
+.tagline {
+    -fx-text-fill: rgba(211, 231, 242, 0.72);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Glass command panel ---------- */
+
+.command-panel {
+    -fx-padding: 23 26 21 26;
+    -fx-background-color:
+        linear-gradient(to bottom right,
+            rgba(7, 19, 37, 0.94),
+            rgba(2, 10, 24, 0.89));
+    -fx-background-radius: 14;
+    -fx-border-color:
+        rgba(92, 225, 255, 0.46),
+        rgba(255, 255, 255, 0.045);
+    -fx-border-width: 1, 1;
+    -fx-border-insets: 0, 5;
+    -fx-border-radius: 14, 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.76), 32, 0.28, 0, 10);
+}
+
+.step-number {
+    -fx-text-fill: #07111f;
+    -fx-background-color: #5adff7;
+    -fx-background-radius: 3;
+    -fx-padding: 2 5 2 5;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.field-label {
+    -fx-text-fill: #e7f8ff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.required-label {
+    -fx-text-fill: rgba(121, 197, 218, 0.63);
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}
+
+.field-hint {
+    -fx-text-fill: rgba(174, 200, 216, 0.58);
+    -fx-font-size: 10px;
+}
+
+/* Text field: normal, hover and focused states. */
+.commander-field {
+    -fx-background-color: rgba(1, 7, 18, 0.90);
+    -fx-background-radius: 7;
+    -fx-border-color: rgba(105, 190, 220, 0.50);
+    -fx-border-width: 1;
+    -fx-border-radius: 7;
+    -fx-text-fill: #effcff;
+    -fx-prompt-text-fill: rgba(145, 181, 199, 0.48);
+    -fx-highlight-fill: #38bad4;
+    -fx-highlight-text-fill: #020914;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 15 0 15;
+}
+
+.commander-field:hover {
+    -fx-background-color: rgba(3, 13, 28, 0.96);
+    -fx-border-color: rgba(102, 224, 250, 0.83);
+    -fx-effect: dropshadow(gaussian, rgba(60, 203, 234, 0.20), 10, 0.25, 0, 0);
+}
+
+.commander-field:focused {
+    -fx-background-color: rgba(3, 14, 30, 0.98);
+    -fx-border-color: #5ee5ff;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(69, 220, 250, 0.42), 14, 0.28, 0, 0);
+}
+
+/* ---------- Buttons ---------- */
+
+.action-button {
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 18 0 18;
+}
+
+/* Von Restorff: the primary action is the only solid, luminous control. */
+.start-button {
+    -fx-background-color: linear-gradient(to right, #4fdcf3 0%, #8cf3ff 52%, #3bc6e9 100%);
+    -fx-text-fill: #02101c;
+    -fx-border-color: rgba(220, 253, 255, 0.88);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(59, 218, 247, 0.58), 18, 0.30, 0, 3);
+}
+
+.start-button:hover {
+    -fx-background-color: linear-gradient(to right, #7deaff 0%, #d7fbff 52%, #67ddf8 100%);
+    -fx-border-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(91, 231, 255, 0.88), 25, 0.40, 0, 4);
+    -fx-scale-x: 1.012;
+    -fx-scale-y: 1.012;
+}
+
+.start-button:pressed,
+.start-button:hover:pressed {
+    -fx-background-color: linear-gradient(to bottom, #27a7c7, #5fd5e8);
+    -fx-border-color: #74e7fa;
+    -fx-effect: innershadow(gaussian, rgba(0, 35, 55, 0.75), 10, 0.45, 0, 2);
+    -fx-scale-x: 0.986;
+    -fx-scale-y: 0.986;
+}
+
+/* Disabled by design: fully opaque, readable, but clearly unavailable. */
+.load-button {
+    -fx-background-color: rgba(14, 29, 47, 0.92);
+    -fx-text-fill: rgba(190, 220, 232, 0.82);
+    -fx-border-color: rgba(103, 180, 205, 0.52);
+    -fx-border-width: 1;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.36), 6, 0.20, 0, 1);
+}
+
+.load-button:hover {
+    -fx-background-color: rgba(24, 48, 69, 0.97);
+    -fx-text-fill: #dff8ff;
+    -fx-border-color: rgba(105, 219, 243, 0.80);
+    -fx-effect: dropshadow(gaussian, rgba(71, 199, 226, 0.26), 12, 0.24, 0, 2);
+}
+
+.load-button:pressed,
+.load-button:hover:pressed {
+    -fx-background-color: rgba(6, 19, 34, 0.98);
+    -fx-text-fill: rgba(194, 226, 237, 0.86);
+    -fx-border-color: rgba(95, 191, 216, 0.65);
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.70), 8, 0.35, 0, 2);
+}
+
+.load-button:disabled {
+    -fx-opacity: 1.0;
+    -fx-background-color: rgba(14, 29, 47, 0.92);
+    -fx-text-fill: rgba(166, 195, 209, 0.58);
+    -fx-border-color: rgba(103, 154, 176, 0.38);
+    -fx-border-width: 1;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.36), 6, 0.20, 0, 1);
+    -fx-cursor: default;
+}
+
+.save-status {
+    -fx-padding: 0 0 0 0;
+}
+
+.save-status-dot {
+    -fx-background-color: #9d6f5c;
+    -fx-background-radius: 99;
+}
+
+.save-status-label {
+    -fx-text-fill: rgba(166, 181, 191, 0.52);
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Footer ---------- */
+
+.footer-bar {
+    -fx-border-color: rgba(102, 220, 255, 0.12) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.footer-line {
+    -fx-background-color: rgba(112, 199, 224, 0.33);
+}
+
+.footer-label {
+    -fx-text-fill: rgba(163, 193, 208, 0.50);
+}
+
+.footer-glyph {
+    -fx-text-fill: rgba(82, 218, 244, 0.72);
+    -fx-font-size: 8px;
+}
