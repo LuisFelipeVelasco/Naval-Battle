@@ -91,4 +91,14 @@ public abstract class Player {
     public boolean isFleetFullyPlaced() {
         return ships.isEmpty();
     }
+
+    /**
+     * Sets or restores the player's board (used when loading a saved game session).
+     *
+     * @param board the restored board instance to assign
+     */
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
 }

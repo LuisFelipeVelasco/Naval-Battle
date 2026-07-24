@@ -1,4 +1,4 @@
-package com.examplez.demo;
+package com.examplez.demo.storage.exceptions;
 
 /**
  * Unchecked custom exception thrown when an error occurs while attempting to load or restore a game session.

@@ -1,13 +1,20 @@
 package com.examplez.demo.model;
 
+import java.io.Serializable;
+
 /**
  * Representation of a ship in the Battleship game.
  * <p>
  * A ship has a unique identifier, a size (number of cells it occupies),
  * and a type (e.g., carrier, submarine, destructor, frigate). Ships are
  * placed on a player's board and can be attacked and sunk during the game.
+ *
+ * <p>Implements {@link Serializable} to support game persistence
+ * within GameState.</p>
+ *
+ * @see java.io.Serializable
  */
-public class Ship {
+public class Ship implements Serializable {
 
     /**
      * Unique identifier for this ship.

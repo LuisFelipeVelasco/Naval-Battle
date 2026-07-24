@@ -1,5 +1,6 @@
 package com.examplez.demo.model;
 
+import java.io.Serializable;
 import com.examplez.demo.model.exceptions.AlreadyAttackedException;
 import com.examplez.demo.model.exceptions.InvalidPositionException;
 
@@ -11,8 +12,13 @@ import java.util.List;
  * <p>
  * The board is a square grid where ships are placed and attacks are recorded.
  * Each cell can be in one of several states: blank, ship, water, hit, or sunken.
+ *
+ * <p>Implements {@link Serializable} to support game persistence
+ * within GameState.</p>
+ *
+ * @see java.io.Serializable
  */
-public class Board {
+public class Board implements Serializable {
 
     /**
      * The matrix of cells that makes up the board.
@@ -49,6 +55,8 @@ public class Board {
      * State of a cell that was shot at and hit part of a ship that has been sunk.
      */
     public static final String SUNKEN = "sunken";
+    /** Counter for ships sunk on this board. */
+    private int numberShipsSunk;
 
     /**
      * The coordinates (row, column) of the last attacked cell, stored as a list.
@@ -226,6 +234,7 @@ public class Board {
                 }
             }
         }
+       numberShipsSunk++;
     }
 
     /**
@@ -278,4 +287,11 @@ public class Board {
         int column = positionLastCellAttacked.get(1);
         return getStateOfCell(row, column);
     }
+
+    /**
+     * Gets the total number of ships sunk on this board.
+     *
+     * @return the number of sunk ships.
+     */
+    public int getNumberShipsSunk() { return numberShipsSunk; }
 }

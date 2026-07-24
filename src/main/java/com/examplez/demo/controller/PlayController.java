@@ -1,4 +1,6 @@
 package com.examplez.demo.controller;
+import com.examplez.demo.storage.GameFileManager;
+import com.examplez.demo.storage.GameState;
 
 import com.examplez.demo.model.*;
 import com.examplez.demo.model.exceptions.InvalidPositionException;
@@ -244,6 +246,9 @@ public class PlayController {
             return;
         }
 
+        // Auto save progress after human move
+        autoSaveGame();
+
         if (result.equals(Board.WATER)) {
             playerTurn = false;
             turnLabel.setText("TURN: MACHINE");
@@ -457,6 +462,9 @@ public class PlayController {
                 return;
             }
 
+            // Auto save progress after machine move
+            autoSaveGame();
+
             String lastResult = humanBoard.getStateLastCellAttacked();
             if (lastResult.equals(Board.WATER)) {
                 playerTurn = true; // turn returns to the player
@@ -474,6 +482,8 @@ public class PlayController {
      * @param winner the winner message to display
      */
     private void changeFinalView(String winner , String status) {
+        // Delete persistent save files when the game ends
+        GameFileManager.deleteGame();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/FinalView.fxml"));
             Parent root = loader.load();
@@ -506,5 +516,35 @@ public class PlayController {
                     && currentRow == row
                     && currentColumn == column;
         });
+    }
+
+    /**
+     * Helper method that captures current match data and auto-saves it to disk.
+     */
+    private void autoSaveGame() {
+        if (gameModel == null) return;
+
+        try {
+            Board humanBoard = gameModel.getPlayerHuman().getBoard();
+            Board machineBoard = gameModel.getPlayerMachine().getBoard();
+
+            // Current state of the Boards
+            GameState currentState = new GameState(humanBoard, machineBoard);
+
+            int currentTurn = playerTurn ? 1 : 0; // 1 = Human turn, 0 = Machine turn
+            int shipsSunkByHuman = machineBoard.getNumberShipsSunk(); // Ships sunk on machine's board
+
+            //String nickname = gameModel.getPlayerHuman().setPlayerName("kjajdf ");
+            GameFileManager.saveGame(currentState, currentTurn, shipsSunkByHuman, "hola");
+        } catch (Exception e) {
+            System.err.println("Error automatic saving game: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Load the turn where a game was saved.
+     * */
+    public void restoreLoadedTurn(int turnLoad){
+        playerTurn = turnLoad == 1;
     }
 }

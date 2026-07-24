@@ -154,4 +154,16 @@ public class Game {
     public PlayerHuman getPlayerHuman() {
         return playerHuman;
     }
+
+    /**
+     * Restores the human and machine boards from a loaded game state.
+     *
+     * @param humanBoard   the loaded human board
+     * @param machineBoard the loaded machine board
+     */
+    public void restoreBoards(Board humanBoard, Board machineBoard) {
+        this.playerHuman.setBoard(humanBoard);
+        this.playerMachine.setBoard(machineBoard);
+    }
+
 }
