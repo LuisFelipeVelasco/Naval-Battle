@@ -1,0 +1,446 @@
+/* ================================================================
+   NAVAL BATTLE — LIVE COMBAT SCREEN
+   Midnight navy, steel blue, restrained violet and controlled cyan.
+   All bright effects are reserved for interaction and game states.
+   ================================================================ */
+
+.battle-root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #030814;
+    -fx-background-image: url("battle-space-background.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+
+/* ---------- Combat header ---------- */
+
+.combat-header {
+    -fx-background-color: linear-gradient(to bottom,
+        rgba(2, 8, 20, 0.94),
+        rgba(3, 12, 29, 0.80),
+        rgba(4, 14, 31, 0.54));
+
+    -fx-border-color:
+        transparent transparent
+        rgba(92, 211, 235, 0.38)
+        transparent;
+
+    -fx-border-width: 0 0 1 0;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.62),
+        18, 0.22, 0, 4
+    );
+}
+
+.header-line {
+    -fx-background-color: linear-gradient(to right,
+        rgba(83, 224, 247, 0.0),
+        rgba(83, 224, 247, 0.86));
+}
+
+.header-line-reversed {
+    -fx-background-color: linear-gradient(to right,
+        rgba(83, 224, 247, 0.86),
+        rgba(83, 224, 247, 0.0));
+}
+
+.eyebrow {
+    -fx-text-fill: #75e5f8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(53, 196, 226, 0.44),
+        7, 0.24, 0, 0
+    );
+}
+
+.screen-title {
+    -fx-text-fill: #f5fcff;
+    -fx-font-size: 37px;
+    -fx-font-weight: bold;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(75, 218, 247, 0.72),
+        16, 0.30, 0, 1
+    );
+}
+
+.turn-status {
+    -fx-padding: 3 12 3 12;
+    -fx-background-color: rgba(6, 22, 43, 0.56);
+    -fx-background-radius: 99;
+    -fx-border-color: rgba(104, 202, 224, 0.24);
+    -fx-border-radius: 99;
+}
+
+.turn-status-dot {
+    -fx-background-color: #68edc4;
+    -fx-background-radius: 99;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(77, 235, 190, 0.90),
+        8, 0.50, 0, 0
+    );
+}
+
+.turn-label {
+    -fx-text-fill: rgba(226, 244, 250, 0.94);
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Main combat area ---------- */
+
+.battle-content {
+    -fx-background-color: linear-gradient(to right,
+        rgba(2, 8, 19, 0.20),
+        rgba(7, 18, 39, 0.10),
+        rgba(2, 8, 19, 0.20));
+}
+
+.board-panel {
+    -fx-background-color: linear-gradient(to bottom right,
+        rgba(7, 23, 46, 0.76),
+        rgba(3, 12, 28, 0.86));
+
+    -fx-background-radius: 14;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.64),
+        20, 0.25, 0, 6
+    );
+}
+
+.enemy-panel {
+    -fx-border-color: rgba(102, 219, 239, 0.64);
+}
+
+.ally-panel {
+    -fx-border-color: rgba(105, 163, 210, 0.54);
+}
+
+.board-header {
+    -fx-padding: 1 4 2 4;
+}
+
+.sector-dot {
+    -fx-background-radius: 99;
+}
+
+.enemy-dot {
+    -fx-background-color: #67e6f9;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(85, 225, 247, 0.92),
+        9, 0.52, 0, 0
+    );
+}
+
+.ally-dot {
+    -fx-background-color: #83aee7;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(103, 154, 222, 0.70),
+        8, 0.42, 0, 0
+    );
+}
+
+.board-title {
+    -fx-text-fill: #f3fbff;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.board-subtitle {
+    -fx-text-fill: rgba(165, 204, 220, 0.76);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.status-badge {
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}
+
+.attack-badge {
+    -fx-background-color: rgba(53, 203, 227, 0.12);
+    -fx-border-color: rgba(99, 226, 246, 0.54);
+    -fx-text-fill: #79e9fa;
+}
+
+.defense-badge {
+    -fx-background-color: rgba(102, 143, 212, 0.13);
+    -fx-border-color: rgba(122, 170, 229, 0.48);
+    -fx-text-fill: #a9c9f2;
+}
+
+/* ---------- Boards ---------- */
+
+.combat-board {
+    -fx-padding: 10;
+
+    -fx-background-color: linear-gradient(to bottom right,
+        rgba(9, 30, 56, 0.72),
+        rgba(3, 13, 29, 0.84));
+
+    -fx-background-radius: 11;
+    -fx-border-width: 1, 1;
+    -fx-border-insets: 0, 5;
+    -fx-border-radius: 11, 7;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.58),
+        16, 0.20, 0, 4
+    );
+}
+
+.enemy-board {
+    -fx-border-color:
+        rgba(100, 218, 239, 0.68),
+        rgba(215, 249, 255, 0.08);
+}
+
+.ally-board {
+    -fx-border-color:
+        rgba(104, 164, 207, 0.58),
+        rgba(199, 221, 246, 0.07);
+}
+
+/*
+ * Fallback styling for cells created as Button or Region.
+ * Rectangle-specific styles are provided below.
+ */
+
+.combat-board .button,
+.combat-cell {
+    -fx-background-color: rgba(46, 87, 113, 0.80);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(118, 190, 211, 0.56);
+    -fx-border-width: 0.9;
+    -fx-border-radius: 4;
+    -fx-padding: 0;
+}
+
+.enemy-board .button,
+.enemy-cell {
+    -fx-cursor: crosshair;
+}
+
+.ally-board .button,
+.ally-cell {
+    -fx-background-color: rgba(39, 72, 99, 0.76);
+    -fx-border-color: rgba(102, 158, 191, 0.48);
+}
+
+.enemy-board .button:hover,
+.enemy-cell:hover {
+    -fx-background-color: rgba(61, 137, 165, 0.90);
+    -fx-border-color: #91edfb;
+    -fx-border-width: 1.5;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(78, 220, 244, 0.62),
+        11, 0.36, 0, 0
+    );
+
+    -fx-scale-x: 1.035;
+    -fx-scale-y: 1.035;
+}
+
+.enemy-board .button:pressed,
+.enemy-cell:pressed {
+    -fx-background-color: rgba(133, 222, 237, 0.92);
+    -fx-border-color: #f3feff;
+
+    -fx-effect: innershadow(
+        gaussian,
+        rgba(0, 42, 62, 0.74),
+        7, 0.40, 0, 1
+    );
+
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* A miss becomes near-black. */
+
+.combat-cell.miss-cell,
+.combat-board .button.miss-cell {
+    -fx-background-color: rgba(3, 8, 14, 0.98);
+    -fx-border-color: rgba(66, 88, 105, 0.76);
+    -fx-border-width: 1;
+
+    -fx-effect: innershadow(
+        gaussian,
+        rgba(0, 0, 0, 0.92),
+        9, 0.55, 0, 1
+    );
+
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-cursor: default;
+}
+
+.combat-cell.hit-cell,
+.combat-board .button.hit-cell {
+    -fx-background-color: linear-gradient(to bottom right,
+        rgba(184, 75, 91, 0.94),
+        rgba(111, 32, 52, 0.96));
+
+    -fx-border-color: #ff9ca9;
+    -fx-border-width: 1.7;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(242, 82, 104, 0.68),
+        12, 0.42, 0, 0
+    );
+
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-cursor: default;
+}
+
+.combat-cell.sunk-cell,
+.combat-board .button.sunk-cell {
+    -fx-background-color: linear-gradient(to bottom right,
+        rgba(91, 19, 35, 0.98),
+        rgba(28, 6, 14, 0.99));
+
+    -fx-border-color: #ff657b;
+    -fx-border-width: 2;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(255, 67, 94, 0.62),
+        15, 0.42, 0, 0
+    );
+
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-cursor: default;
+}
+
+.combat-cell.ship-cell,
+.combat-board .button.ship-cell {
+    -fx-background-color: linear-gradient(to bottom right,
+        rgba(67, 105, 136, 0.94),
+        rgba(31, 59, 86, 0.96));
+
+    -fx-border-color: rgba(118, 218, 237, 0.82);
+    -fx-border-width: 1.2;
+
+    -fx-effect: innershadow(
+        gaussian,
+        rgba(0, 0, 0, 0.40),
+        6, 0.24, 0, 1
+    );
+}
+
+/* ---------- Rectangle cells ---------- */
+
+.combat-rectangle {
+    -fx-fill: rgba(46, 87, 113, 0.80);
+    -fx-stroke: rgba(118, 190, 211, 0.56);
+    -fx-stroke-width: 0.9;
+}
+
+.combat-rectangle.ally-cell {
+    -fx-fill: rgba(39, 72, 99, 0.76);
+    -fx-stroke: rgba(102, 158, 191, 0.48);
+}
+
+.combat-rectangle.enemy-cell:hover {
+    -fx-fill: rgba(61, 137, 165, 0.90);
+    -fx-stroke: #91edfb;
+    -fx-stroke-width: 1.5;
+}
+
+.combat-rectangle.miss-cell {
+    -fx-fill: rgba(3, 8, 14, 0.98);
+    -fx-stroke: rgba(66, 88, 105, 0.76);
+    -fx-stroke-width: 1;
+}
+
+.combat-rectangle.hit-cell {
+    -fx-fill: rgba(171, 59, 79, 0.96);
+    -fx-stroke: #ff9ca9;
+    -fx-stroke-width: 1.7;
+}
+
+.combat-rectangle.sunk-cell {
+    -fx-fill: rgba(63, 12, 25, 0.99);
+    -fx-stroke: #ff657b;
+    -fx-stroke-width: 2;
+}
+
+.combat-rectangle.ship-cell {
+    -fx-fill: rgba(57, 92, 122, 0.95);
+    -fx-stroke: rgba(118, 218, 237, 0.82);
+    -fx-stroke-width: 1.2;
+}
+
+/* ---------- Board footer ---------- */
+
+.board-footer {
+    -fx-padding: 2 4 0 4;
+}
+
+.board-instruction {
+    -fx-text-fill: rgba(189, 220, 231, 0.82);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.legend-dot {
+    -fx-background-radius: 99;
+    -fx-border-radius: 99;
+}
+
+.miss-dot {
+    -fx-background-color: #080e16;
+    -fx-border-color: #516474;
+}
+
+.hit-dot {
+    -fx-background-color: #c28637;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgb(141, 95, 36),
+        5, 0.30, 0, 0
+    );
+}
+
+.sunk-dot {
+    -fx-background-color: #5a1426;
+    -fx-border-color: #ff657b;
+}
+
+.ship-dot {
+    -fx-background-color: #487694;
+    -fx-border-color: #78d9ed;
+}
+
+.legend-label {
+    -fx-text-fill: rgba(181, 211, 222, 0.76);
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}

@@ -1,222 +1,309 @@
-/* ================================================================
-   NAVAL BATTLE — PLACEMENT / CLEAN HUD THEME (NO IMAGE)
-   ================================================================ */
-
 .placement-root {
     -fx-font-family: "Segoe UI";
-    -fx-background-color: #020712;
+    -fx-background-color: #040a17;
 }
 
-.placement-clean {
-    -fx-background-color:
-        radial-gradient(center 36% 44%, radius 72%,
-            rgba(16, 56, 84, 0.72) 0%,
-            rgba(4, 17, 34, 0.88) 58%,
-            rgba(1, 7, 18, 1.0) 100%),
-        linear-gradient(to bottom right, #071a31, #020815);
+.placement-space {
+    -fx-background-image: url("naval-battle-space-2.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
 }
 
-/* ---------- Mission header ---------- */
+/* ==================== HEADER ==================== */
 
 .mission-header {
     -fx-background-color: linear-gradient(to bottom,
-        rgba(5, 19, 38, 0.99),
-        rgba(3, 14, 29, 0.98));
-    -fx-border-color: transparent transparent rgba(90, 221, 247, 0.48) transparent;
+    rgba(2, 8, 20, 0.88),
+    rgba(3, 11, 27, 0.73),
+    rgba(3, 12, 28, 0.42));
+    -fx-border-color:
+            transparent transparent
+            rgba(89, 203, 229, 0.34)
+            transparent;
     -fx-border-width: 0 0 1 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.46), 12, 0.18, 0, 3);
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.52),
+            16, 0.18, 0, 4
+    );
 }
 
 .header-line {
     -fx-background-color: linear-gradient(to right,
-        rgba(82, 222, 248, 0.0), rgba(82, 222, 248, 0.78));
+    rgba(82, 222, 248, 0.0),
+    rgba(82, 222, 248, 0.88));
 }
 
 .header-line-reversed {
     -fx-background-color: linear-gradient(to right,
-        rgba(82, 222, 248, 0.78), rgba(82, 222, 248, 0.0));
+    rgba(82, 222, 248, 0.88),
+    rgba(82, 222, 248, 0.0));
 }
 
 .eyebrow {
-    -fx-text-fill: #68dff6;
-    -fx-font-size: 9px;
+    -fx-text-fill: #74e4f8;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(38, 186, 222, 0.42),
+            7, 0.22, 0, 0
+    );
 }
 
 .screen-title {
-    -fx-text-fill: #f2fbff;
-    -fx-font-size: 29px;
+    -fx-text-fill: #f5fcff;
+    -fx-font-size: 39px;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(69, 220, 250, 0.68), 13, 0.30, 0, 1);
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(79, 222, 249, 0.76),
+            17, 0.31, 0, 1
+    );
 }
 
 .screen-subtitle {
-    -fx-text-fill: rgba(197, 224, 237, 0.72);
-    -fx-font-size: 11px;
+    -fx-text-fill: rgba(218, 237, 247, 0.88);
+    -fx-font-size: 14px;
 }
 
-/* ---------- Tactical board ---------- */
+/* ==================== BOARD ==================== */
 
 .board-zone {
     -fx-background-color: linear-gradient(to right,
-        rgba(4, 17, 34, 0.92),
-        rgba(8, 30, 51, 0.78),
-        rgba(3, 15, 31, 0.96));
+    rgba(3, 10, 25, 0.43),
+    rgba(9, 25, 51, 0.25),
+    rgba(3, 10, 25, 0.50));
+    -fx-background-radius: 0 15 15 0;
 }
 
 .board-caption {
-    -fx-padding: 0 5 0 5;
+    -fx-padding: 2 7 2 7;
 }
 
 .board-status-dot {
-    -fx-background-color: #58e0f8;
+    -fx-background-color: #69e8fa;
     -fx-background-radius: 99;
-    -fx-effect: dropshadow(gaussian, rgba(88, 224, 248, 0.90), 8, 0.55, 0, 0);
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(92, 229, 250, 0.96),
+            10, 0.58, 0, 0
+    );
 }
 
 .board-caption-title {
-    -fx-text-fill: #e9faff;
-    -fx-font-size: 10px;
+    -fx-text-fill: #f2fbff;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
 
-.board-caption-meta,
+.board-caption-meta {
+    -fx-text-fill: rgba(171, 208, 222, 0.80);
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
 .board-hint {
-    -fx-text-fill: rgba(148, 192, 209, 0.62);
-    -fx-font-size: 8px;
+    -fx-text-fill: rgba(185, 220, 234, 0.83);
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
 .board-grid {
     -fx-padding: 10;
+
     -fx-background-color:
-        linear-gradient(to bottom right,
-            rgba(9, 38, 62, 0.99),
-            rgba(3, 18, 35, 1.0));
-    -fx-background-radius: 11;
+            linear-gradient(to bottom right,
+            rgba(7, 24, 47, 0.66),
+            rgba(3, 12, 28, 0.79));
+
+    -fx-background-radius: 13;
+
     -fx-border-color:
-        rgba(91, 221, 247, 0.70),
-        rgba(255, 255, 255, 0.07);
+            rgba(104, 218, 239, 0.70),
+            rgba(192, 239, 249, 0.12);
+
     -fx-border-width: 1, 1;
     -fx-border-insets: 0, 5;
-    -fx-border-radius: 11, 7;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.64), 18, 0.22, 0, 5);
+    -fx-border-radius: 13, 9;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.62),
+            20, 0.24, 0, 6
+    );
 }
 
 /*
- * Las casillas creadas desde el controlador pueden ser Button o cualquier
- * Region con la clase "board-cell".
+ * These styles work if the cells are Button or Region.
+ * If they are Rectangle, use the previous Java functions.
  */
+
 .board-grid .button,
 .board-cell {
-    -fx-background-color: rgba(9, 43, 70, 1.0);
-    -fx-background-radius: 3;
-    -fx-border-color: rgba(89, 175, 207, 0.58);
+    -fx-background-color: rgba(49, 91, 121, 0.72);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(120, 202, 222, 0.58);
     -fx-border-width: 1;
-    -fx-border-radius: 3;
-    -fx-text-fill: rgba(218, 245, 255, 0.84);
+    -fx-border-radius: 4;
+    -fx-text-fill: rgba(228, 246, 252, 0.90);
     -fx-cursor: hand;
     -fx-padding: 0;
 }
 
 .board-grid .button:hover,
 .board-cell:hover {
-    -fx-background-color: rgba(25, 105, 133, 0.98);
-    -fx-border-color: #78edff;
-    -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(77, 225, 250, 0.82), 13, 0.42, 0, 0);
-    -fx-scale-x: 1.055;
-    -fx-scale-y: 1.055;
+    -fx-background-color: rgba(67, 126, 156, 0.82);
+    -fx-border-color: #8deafa;
+    -fx-border-width: 1.5;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(83, 220, 244, 0.58),
+            10, 0.32, 0, 0
+    );
+
+    -fx-scale-x: 1.035;
+    -fx-scale-y: 1.035;
 }
 
 .board-grid .button:pressed,
 .board-cell:pressed {
-    -fx-background-color: #b8f8ff;
-    -fx-border-color: #ffffff;
-    -fx-effect: innershadow(gaussian, rgba(0, 68, 91, 0.76), 8, 0.42, 0, 1);
-    -fx-scale-x: 0.96;
-    -fx-scale-y: 0.96;
+    -fx-background-color: rgba(126, 218, 235, 0.88);
+    -fx-border-color: #f0fdff;
+
+    -fx-effect: innershadow(
+            gaussian,
+            rgba(0, 45, 67, 0.72),
+            7, 0.38, 0, 1
+    );
+
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
 }
 
-/* Estado de arrastre general y previsualización de una posición válida. */
+/* Valid drag */
+
 .board-grid.drag-active .board-cell:hover,
 .board-cell.drag-over,
 .board-cell.drag-valid,
 .board-grid .button.drag-over,
 .board-grid .button.drag-valid {
-    -fx-background-color: linear-gradient(to bottom right, #6eeaff, #2fabc9);
-    -fx-border-color: #e4fdff;
+    -fx-background-color: rgba(73, 207, 226, 0.68);
+    -fx-border-color: #c8f9ff;
     -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(76, 233, 255, 0.95), 17, 0.52, 0, 0);
-    -fx-scale-x: 1.07;
-    -fx-scale-y: 1.07;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(78, 225, 246, 0.80),
+            14, 0.44, 0, 0
+    );
+
+    -fx-scale-x: 1.045;
+    -fx-scale-y: 1.045;
 }
 
-/* Previsualización de una posición que colisiona o sale del tablero. */
+/* Invalid drag */
+
 .board-cell.drag-invalid,
 .board-grid .button.drag-invalid {
-    -fx-background-color: linear-gradient(to bottom, #bb4050, #732334);
-    -fx-border-color: #ff9aa7;
+    -fx-background-color: rgba(157, 69, 89, 0.78);
+    -fx-border-color: #ff9aac;
     -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(255, 77, 99, 0.78), 14, 0.45, 0, 0);
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(239, 91, 116, 0.55),
+            12, 0.35, 0, 0
+    );
 }
 
 .board-cell.ship-placed,
 .board-grid .button.ship-placed {
-    -fx-background-color: linear-gradient(to bottom right, #254f6e, #152f49);
-    -fx-border-color: rgba(115, 225, 246, 0.86);
-    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.50), 6, 0.25, 0, 1);
+    -fx-background-color: rgba(34, 61, 87, 0.78);
+    -fx-border-color: rgba(122, 220, 238, 0.72);
+
+    -fx-effect: innershadow(
+            gaussian,
+            rgba(0, 0, 0, 0.42),
+            6, 0.22, 0, 1
+    );
 }
 
-/* ---------- Fleet side panel ---------- */
+/* ==================== FLEET PANEL ==================== */
 
 .fleet-panel {
     -fx-background-color: linear-gradient(to bottom,
-        rgba(7, 27, 48, 1.0),
-        rgba(3, 14, 29, 1.0));
-    -fx-border-color: rgba(86, 212, 239, 0.58) transparent transparent rgba(86, 212, 239, 0.58);
+    rgba(5, 16, 35, 0.87),
+    rgba(5, 19, 40, 0.82),
+    rgba(2, 10, 25, 0.91));
+
+    -fx-border-color:
+            rgba(96, 214, 238, 0.64)
+            transparent
+            transparent
+            rgba(96, 214, 238, 0.48);
+
     -fx-border-width: 1 0 0 1;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.52), 14, 0.20, -4, 2);
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.58),
+            18, 0.22, -5, 3
+    );
 }
 
 .section-accent {
-    -fx-background-color: linear-gradient(to bottom, #80efff, #248eb3);
-    -fx-background-radius: 2;
-    -fx-effect: dropshadow(gaussian, rgba(76, 221, 248, 0.58), 8, 0.42, 0, 0);
+    -fx-background-color: linear-gradient(
+            to bottom,
+            #8af2ff,
+            #2b91b5
+    );
+
+    -fx-background-radius: 3;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(83, 225, 250, 0.68),
+            9, 0.44, 0, 0
+    );
 }
 
 .panel-title {
-    -fx-text-fill: #effbff;
-    -fx-font-size: 11px;
+    -fx-text-fill: #f4fcff;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
 
 .panel-kicker {
-    -fx-text-fill: rgba(136, 184, 202, 0.58);
-    -fx-font-size: 7px;
+    -fx-text-fill: rgba(161, 205, 221, 0.75);
+    -fx-font-size: 10px;
     -fx-font-weight: bold;
 }
 
 .ready-badge {
-    -fx-padding: 3 6 3 6;
-    -fx-background-color: rgba(54, 213, 168, 0.13);
-    -fx-background-radius: 3;
-    -fx-border-color: rgba(76, 226, 174, 0.47);
-    -fx-border-radius: 3;
-    -fx-text-fill: #67e3b9;
-    -fx-font-size: 7px;
+    -fx-padding: 4 8 4 8;
+    -fx-background-color: rgba(54, 213, 168, 0.14);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(84, 232, 184, 0.62);
+    -fx-border-radius: 4;
+    -fx-text-fill: #81efc9;
+    -fx-font-size: 10px;
     -fx-font-weight: bold;
 }
 
+/* ==================== SHIP LIST ==================== */
+
 .ship-list {
-    -fx-background-color: rgba(2, 13, 28, 0.98);
-    -fx-background-radius: 7;
-    -fx-border-color: rgba(88, 182, 212, 0.52);
-    -fx-border-radius: 7;
+    -fx-background-color: rgba(2, 12, 29, 0.66);
+    -fx-background-radius: 9;
+    -fx-border-color: rgba(102, 196, 220, 0.52);
+    -fx-border-radius: 9;
     -fx-border-width: 1;
     -fx-background-insets: 0;
-    -fx-padding: 4;
-    -fx-control-inner-background: #061326;
+    -fx-padding: 5;
+    -fx-control-inner-background: transparent;
 }
 
 .ship-list .viewport,
@@ -227,28 +314,40 @@
 }
 
 .ship-list .list-cell {
+    -fx-background-color: rgba(8, 27, 53, 0.24);
+    -fx-background-radius: 7;
+    -fx-text-fill: rgba(224, 243, 250, 0.92);
+    -fx-font-size: 13px;
+    -fx-padding: 9;
+
+    -fx-border-color:
+            transparent
+            transparent
+            rgba(115, 175, 198, 0.16)
+            transparent;
+}
+
+.ship-list .list-cell:empty {
     -fx-background-color: transparent;
-    -fx-background-radius: 5;
-    -fx-text-fill: rgba(210, 234, 244, 0.80);
-    -fx-font-size: 10px;
-    -fx-padding: 8 8 8 9;
-    -fx-border-color: transparent transparent rgba(89, 151, 177, 0.14) transparent;
+    -fx-border-color: transparent;
 }
 
 .ship-list .list-cell:filled:hover {
-    -fx-background-color: rgba(38, 123, 153, 0.30);
-    -fx-text-fill: #eafcff;
-    -fx-border-color: rgba(98, 221, 244, 0.52);
-    -fx-border-radius: 5;
+    -fx-background-color: rgba(54, 112, 143, 0.27);
+    -fx-text-fill: #f5fdff;
+    -fx-border-color: rgba(113, 222, 243, 0.48);
+    -fx-border-radius: 7;
     -fx-cursor: hand;
 }
 
 .ship-list .list-cell:filled:selected {
     -fx-background-color: linear-gradient(to right,
-        rgba(48, 178, 207, 0.62), rgba(23, 82, 111, 0.54));
+    rgba(48, 143, 174, 0.48),
+    rgba(28, 73, 109, 0.38));
+
     -fx-text-fill: #ffffff;
-    -fx-border-color: rgba(117, 235, 255, 0.74);
-    -fx-border-radius: 5;
+    -fx-border-color: rgba(135, 235, 251, 0.74);
+    -fx-border-radius: 7;
 }
 
 .ship-list .scroll-bar:vertical,
@@ -256,94 +355,166 @@
     -fx-background-color: transparent;
 }
 
-.ship-list .scroll-bar .thumb {
-    -fx-background-color: rgba(78, 188, 216, 0.45);
+.ship-list .scroll-bar .track {
+    -fx-background-color: rgba(8, 25, 43, 0.52);
     -fx-background-radius: 99;
 }
 
+.ship-list .scroll-bar .thumb {
+    -fx-background-color: rgba(92, 185, 211, 0.58);
+    -fx-background-radius: 99;
+}
+
+.ship-list .scroll-bar .thumb:hover {
+    -fx-background-color: rgba(112, 222, 241, 0.76);
+}
+
+/* ==================== ORIENTATION ==================== */
+
 .orientation-status {
-    -fx-padding: 7 9 7 9;
-    -fx-background-color: rgba(12, 31, 49, 0.72);
-    -fx-background-radius: 5;
-    -fx-border-color: rgba(87, 161, 187, 0.24);
-    -fx-border-radius: 5;
+    -fx-padding: 9 11 9 11;
+    -fx-background-color: rgba(17, 42, 67, 0.62);
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(104, 181, 207, 0.32);
+    -fx-border-radius: 6;
 }
 
 .orientation-label,
 .orientation-value {
-    -fx-text-fill: rgba(160, 199, 214, 0.66);
-    -fx-font-size: 7px;
+    -fx-text-fill: rgba(187, 221, 233, 0.84);
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
 .orientation-icon {
-    -fx-text-fill: #64e4fb;
-    -fx-font-size: 14px;
-    -fx-effect: dropshadow(gaussian, rgba(90, 226, 250, 0.55), 6, 0.35, 0, 0);
+    -fx-text-fill: #75e9fb;
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(90, 226, 250, 0.62),
+            7, 0.38, 0, 0
+    );
 }
 
-/* ---------- Buttons ---------- */
+/* ==================== BUTTONS ==================== */
 
 .action-button {
-    -fx-background-radius: 6;
-    -fx-border-radius: 6;
-    -fx-font-size: 10px;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .rotate-button {
-    -fx-background-color: rgba(19, 50, 72, 0.94);
-    -fx-text-fill: rgba(218, 241, 249, 0.88);
-    -fx-border-color: rgba(92, 190, 216, 0.52);
+    -fx-background-color: rgba(23, 55, 82, 0.92);
+    -fx-text-fill: rgba(232, 247, 252, 0.94);
+    -fx-border-color: rgba(105, 200, 224, 0.58);
     -fx-border-width: 1;
 }
 
 .rotate-button:hover {
-    -fx-background-color: rgba(37, 101, 128, 0.96);
+    -fx-background-color: rgba(45, 103, 132, 0.96);
     -fx-text-fill: #ffffff;
-    -fx-border-color: #70e8ff;
-    -fx-effect: dropshadow(gaussian, rgba(80, 218, 244, 0.40), 12, 0.28, 0, 2);
+    -fx-border-color: #83e9fa;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(80, 218, 244, 0.44),
+            13, 0.30, 0, 2
+    );
+
+    -fx-scale-x: 1.012;
+    -fx-scale-y: 1.012;
 }
 
 .rotate-button:pressed,
 .rotate-button:hover:pressed {
-    -fx-background-color: rgba(7, 27, 43, 0.98);
-    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.65), 8, 0.34, 0, 2);
+    -fx-background-color: rgba(10, 34, 54, 0.98);
+
+    -fx-effect: innershadow(
+            gaussian,
+            rgba(0, 0, 0, 0.66),
+            8, 0.34, 0, 2
+    );
+
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
 }
 
-/* Von Restorff: único control sólido y luminoso del panel. */
+/* Main button: Von Restorff effect */
+
 .start-match-button {
-    -fx-background-color: linear-gradient(to right, #4cdcf4, #92f3ff, #36c1e4);
-    -fx-text-fill: #02111d;
-    -fx-border-color: rgba(225, 254, 255, 0.90);
+    -fx-background-color: linear-gradient(to right,
+    #48d2ed,
+    #8cedfa,
+    #42c9e7);
+
+    -fx-text-fill: #03131f;
+    -fx-border-color: rgba(231, 253, 255, 0.94);
     -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(61, 221, 248, 0.58), 17, 0.32, 0, 3);
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(61, 221, 248, 0.60),
+            18, 0.34, 0, 3
+    );
 }
 
 .start-match-button:hover {
-    -fx-background-color: linear-gradient(to right, #81edff, #e1fcff, #6ce1f8);
+    -fx-background-color: linear-gradient(to right,
+    #7fe8fa,
+    #dcfbff,
+    #6ee0f5);
+
     -fx-border-color: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(92, 234, 255, 0.90), 23, 0.42, 0, 4);
-    -fx-scale-x: 1.018;
-    -fx-scale-y: 1.018;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(92, 234, 255, 0.88),
+            23, 0.42, 0, 4
+    );
+
+    -fx-scale-x: 1.016;
+    -fx-scale-y: 1.016;
 }
 
 .start-match-button:pressed,
 .start-match-button:hover:pressed {
-    -fx-background-color: linear-gradient(to bottom, #269dbc, #5dd2e6);
-    -fx-border-color: #79eaff;
-    -fx-effect: innershadow(gaussian, rgba(0, 40, 58, 0.78), 9, 0.42, 0, 2);
+    -fx-background-color: linear-gradient(
+            to bottom,
+            #279fbd,
+            #5fd3e7
+    );
+
+    -fx-border-color: #83ebfb;
+
+    -fx-effect: innershadow(
+            gaussian,
+            rgba(0, 40, 58, 0.78),
+            9, 0.42, 0, 2
+    );
+
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
 }
 
+.action-button:focused {
+    -fx-border-color: #b8f6ff;
+    -fx-border-width: 1.5;
+}
+
+/*
+ * Preserves shape and contrast when disabled.
+ * Does not use a global opacity reduction.
+ */
+
 .action-button:disabled {
     -fx-opacity: 1.0;
-    -fx-background-color: rgba(21, 38, 53, 0.92);
-    -fx-text-fill: rgba(153, 177, 189, 0.46);
-    -fx-border-color: rgba(102, 143, 159, 0.28);
+    -fx-background-color: rgba(27, 46, 66, 0.94);
+    -fx-text-fill: rgba(164, 190, 203, 0.62);
+    -fx-border-color: rgba(111, 157, 176, 0.34);
     -fx-effect: none;
 }

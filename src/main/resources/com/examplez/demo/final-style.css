@@ -1,0 +1,247 @@
+/* ================================================================
+   NAVAL BATTLE — FINAL MISSION DEBRIEF
+   Same midnight navy, blue-violet and cyan visual language.
+   ================================================================ */
+
+.final-root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #030814;
+    -fx-background-image: url("final-space-background.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+
+/* ---------- Result panel ---------- */
+
+.result-card {
+    -fx-background-color: linear-gradient(to bottom,
+        rgba(4, 16, 35, 0.91),
+        rgba(5, 23, 47, 0.85),
+        rgba(2, 10, 26, 0.93));
+
+    -fx-background-radius: 17;
+
+    -fx-border-color:
+        rgba(104, 220, 241, 0.72),
+        rgba(217, 251, 255, 0.12);
+
+    -fx-border-width: 1, 1;
+    -fx-border-insets: 0, 5;
+    -fx-border-radius: 17, 12;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.70),
+        26, 0.28, 0, 8
+    );
+}
+
+.header-line {
+    -fx-background-color: linear-gradient(to right,
+        rgba(85, 225, 248, 0.0),
+        rgba(85, 225, 248, 0.88));
+}
+
+.header-line-reversed {
+    -fx-background-color: linear-gradient(to right,
+        rgba(85, 225, 248, 0.88),
+        rgba(85, 225, 248, 0.0));
+}
+
+.eyebrow {
+    -fx-text-fill: #79e7fa;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(65, 205, 235, 0.48),
+        7, 0.24, 0, 0
+    );
+}
+
+.game-title {
+    -fx-text-fill: #f4fcff;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(80, 221, 248, 0.70),
+        15, 0.30, 0, 1
+    );
+}
+
+.section-divider {
+    -fx-background-color: linear-gradient(to right,
+        rgba(101, 222, 243, 0.0),
+        rgba(101, 222, 243, 0.55),
+        rgba(101, 222, 243, 0.0));
+}
+
+.result-kicker {
+    -fx-text-fill: rgba(162, 211, 225, 0.82);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.winner-label {
+    -fx-text-fill: #f8feff;
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 4 0;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(91, 230, 252, 0.86),
+        21, 0.34, 0, 2
+    );
+}
+
+.result-message {
+    -fx-text-fill: rgba(202, 229, 239, 0.84);
+    -fx-font-size: 14px;
+    -fx-padding: 2 20 6 20;
+}
+
+/* ---------- Actions ---------- */
+
+.button-row {
+    -fx-padding: 10 0 3 0;
+}
+
+.final-button {
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* Von Restorff: the main action is intentionally luminous. */
+
+.play-again-button {
+    -fx-background-color: linear-gradient(to right,
+        #49d5ee,
+        #91effb,
+        #42c7e5);
+
+    -fx-text-fill: #03131f;
+    -fx-border-color: rgba(233, 254, 255, 0.95);
+    -fx-border-width: 1;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(67, 223, 248, 0.66),
+        19, 0.35, 0, 3
+    );
+}
+
+.play-again-button:hover {
+    -fx-background-color: linear-gradient(to right,
+        #82eafa,
+        #e3fcff,
+        #6bdef3);
+
+    -fx-border-color: #ffffff;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(107, 237, 255, 0.95),
+        25, 0.44, 0, 4
+    );
+
+    -fx-scale-x: 1.025;
+    -fx-scale-y: 1.025;
+}
+
+.play-again-button:pressed,
+.play-again-button:hover:pressed {
+    -fx-background-color: linear-gradient(to bottom,
+        #249cbb,
+        #5bd3e7);
+
+    -fx-border-color: #86edfc;
+
+    -fx-effect: innershadow(
+        gaussian,
+        rgba(0, 42, 60, 0.78),
+        9, 0.42, 0, 2
+    );
+
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.exit-button {
+    -fx-background-color: rgba(18, 45, 70, 0.92);
+    -fx-text-fill: rgba(228, 244, 250, 0.91);
+    -fx-border-color: rgba(105, 190, 216, 0.56);
+    -fx-border-width: 1;
+}
+
+.exit-button:hover {
+    -fx-background-color: rgba(42, 93, 121, 0.96);
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #86eaf9;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(80, 215, 241, 0.42),
+        13, 0.30, 0, 2
+    );
+
+    -fx-scale-x: 1.018;
+    -fx-scale-y: 1.018;
+}
+
+.exit-button:pressed,
+.exit-button:hover:pressed {
+    -fx-background-color: rgba(7, 25, 43, 0.98);
+
+    -fx-effect: innershadow(
+        gaussian,
+        rgba(0, 0, 0, 0.70),
+        8, 0.36, 0, 2
+    );
+
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.final-button:focused {
+    -fx-border-color: #c1f8ff;
+    -fx-border-width: 1.5;
+}
+
+.final-button:disabled {
+    -fx-opacity: 1.0;
+    -fx-background-color: rgba(27, 46, 66, 0.94);
+    -fx-text-fill: rgba(164, 190, 203, 0.62);
+    -fx-border-color: rgba(111, 157, 176, 0.34);
+    -fx-effect: none;
+}
+
+/* ---------- Footer status ---------- */
+
+.system-status {
+    -fx-padding: 7 12 0 12;
+}
+
+.system-dot {
+    -fx-background-color: #72edc7;
+    -fx-background-radius: 99;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(90, 234, 196, 0.85),
+        7, 0.46, 0, 0
+    );
+}
+
+.system-text {
+    -fx-text-fill: rgba(163, 205, 219, 0.72);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}

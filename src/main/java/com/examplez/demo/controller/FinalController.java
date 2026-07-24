@@ -30,6 +30,9 @@ public class FinalController {
     @FXML
     Button closeGame;
 
+    @FXML
+    Label statusLabel;
+
     /**
      * Handles the event when the "New Game" button is selected.
      * Loads the main menu view and transitions the current stage to it.
@@ -42,10 +45,8 @@ public class FinalController {
         String fxml = "/com/examplez/demo/menu-view.fxml";
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
         Parent root = loader.load();
-        StartController controller = loader.getController();
-
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 860, 650));
+        stage.setScene(new Scene(root, 1100, 720));
         stage.centerOnScreen();
 
         stage.show();
@@ -71,4 +72,14 @@ public class FinalController {
     public void setWinner(String winner) {
         WinnerLabel.setText(winner);
     }
+
+    /**
+     * Sets the player status to be displayed on the final screen.
+     *
+     * @param status The status of the command
+     */
+    public void setStatus(String status) {
+        statusLabel.setText(status);
+    }
+
 }

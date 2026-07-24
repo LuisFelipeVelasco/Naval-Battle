@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" styleClass="battle-root" stylesheets="@battle-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.PlayController">
+
+    <top>
+        <VBox alignment="CENTER" spacing="4.0" styleClass="combat-header" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="14.0" left="28.0" right="28.0" top="15.0" />
+            </padding>
+
+            <HBox alignment="CENTER" spacing="11.0">
+                <Region prefHeight="2.0" prefWidth="55.0" styleClass="header-line" />
+
+                <Label styleClass="eyebrow" text="COMBAT NETWORK // LIVE ENGAGEMENT" />
+
+                <Region prefHeight="2.0" prefWidth="55.0" styleClass="header-line-reversed" />
+            </HBox>
+
+            <Label styleClass="screen-title" text="BATTLESHIP" />
+
+            <HBox alignment="CENTER" spacing="8.0" styleClass="turn-status">
+
+                <Region maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" prefHeight="8.0" prefWidth="8.0" styleClass="turn-status-dot" />
+
+                <Label fx:id="turnLabel" styleClass="turn-label" text="YOUR TURN // SELECT A TARGET" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox alignment="CENTER" spacing="24.0" styleClass="battle-content" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="22.0" right="22.0" top="14.0" />
+            </padding>
+
+            <!-- ENEMY BOARD -->
+
+            <VBox alignment="CENTER" prefWidth="580.0" spacing="10.0" styleClass="board-panel, enemy-panel">
+                <padding>
+                    <Insets bottom="13.0" left="14.0" right="14.0" top="13.0" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" maxWidth="548.0" spacing="9.0" styleClass="board-header">
+
+                    <Region maxHeight="10.0" maxWidth="10.0" minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0" styleClass="sector-dot, enemy-dot" />
+
+                    <VBox spacing="1.0">
+                        <Label styleClass="board-title" text="ENEMY SECTOR" />
+
+                        <Label styleClass="board-subtitle" text="PRIMARY TARGETING GRID" />
+                    </VBox>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Label styleClass="status-badge, attack-badge" text="FIRE CONTROL ACTIVE" />
+                </HBox>
+
+                <GridPane fx:id="mainBoardGrid" alignment="CENTER" hgap="3.0" maxHeight="548.0" maxWidth="548.0" styleClass="combat-board, enemy-board" vgap="3.0" />
+
+                <HBox alignment="CENTER_LEFT" maxWidth="548.0" spacing="10.0" styleClass="board-footer">
+
+                    <Label styleClass="board-instruction" text="SELECT AN UNMARKED CELL TO FIRE" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, miss-dot" />
+                    <Label styleClass="legend-label" text="MISS" />
+
+                    <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, hit-dot" />
+                    <Label styleClass="legend-label" text="HIT" />
+
+                    <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, sunk-dot" />
+                    <Label styleClass="legend-label" text="SUNK" />
+                </HBox>
+            </VBox>
+
+            <!-- ALLY BOARD -->
+
+            <VBox alignment="CENTER" prefWidth="580.0" spacing="10.0" styleClass="board-panel, ally-panel">
+                <padding>
+                    <Insets bottom="13.0" left="14.0" right="14.0" top="13.0" />
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" maxWidth="548.0" spacing="9.0" styleClass="board-header">
+
+                    <Region maxHeight="10.0" maxWidth="10.0" minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0" styleClass="sector-dot, ally-dot" />
+
+                    <VBox spacing="1.0">
+                        <Label styleClass="board-title" text="ALLY SECTOR" />
+
+                        <Label styleClass="board-subtitle" text="FLEET STATUS &amp; OBSERVATION" />
+                    </VBox>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Label styleClass="status-badge, defense-badge" text="DEFENSE LINK ONLINE" />
+                </HBox>
+
+                <GridPane fx:id="positionBoardGrid" alignment="CENTER" hgap="3.0" maxHeight="548.0" maxWidth="548.0" styleClass="combat-board, ally-board" vgap="3.0" />
+
+                <HBox alignment="CENTER_LEFT" maxWidth="548.0" spacing="10.0" styleClass="board-footer">
+
+                    <Label styleClass="board-instruction" text="YOUR FLEET IS DISPLAYED ON THIS GRID" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+               <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, miss-dot" />
+               <Label styleClass="legend-label" text="MISS" />
+               <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, hit-dot" />
+               <Label styleClass="legend-label" text="HIT" />
+               <Region prefHeight="8.0" prefWidth="8.0" styleClass="legend-dot, sunk-dot" />
+               <Label styleClass="legend-label" text="SUNK" />
+                </HBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

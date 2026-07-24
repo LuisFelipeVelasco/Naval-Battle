@@ -10,6 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
@@ -20,10 +22,9 @@ import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
 import java.util.Map;
 import java.util.HashMap;
-
-import java.io.IOException;
 
 /**
  * Controller for the ship placement view (PlaceShips-View.fxml).
@@ -40,13 +41,33 @@ public class PlacementController {
      * Map that stores ship type images for visual representation on the board.
      */
     private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
+    /**
+     * Map that stores ship card images for visual representation on the board.
+     */
+    private static final Map<String, Image> CARD_SHIP_IMAGES = new HashMap<>();
 
     static {
-        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/cards/carrier.png")));
-        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/cards/submarine.png")));
-        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/cards/destructor.png")));
-        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/cards/frigate.png")));
+        SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/Images/carrier.png")));
+        SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/Images/submarine.png")));
+        SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/Images/destructor.png")));
+        SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/Images/frigate.png")));
     }
+
+    static {
+        CARD_SHIP_IMAGES.put("carrier", new Image(PlacementController.class.getResourceAsStream("/cards/carrier.png")));
+        CARD_SHIP_IMAGES.put("submarine", new Image(PlacementController.class.getResourceAsStream("/cards/submarine.png")));
+        CARD_SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/cards/destructor.png")));
+        CARD_SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/cards/frigate.png")));
+    }
+    /**color of one cell.*/
+    private static final Color CELL_A =
+            Color.web("#315B79", 0.72);
+    /**color of one cell.*/
+    private static final Color CELL_B =
+            Color.web("#3A6782", 0.68);
+    /**border of one cell.*/
+    private static final Color CELL_STROKE =
+            Color.web("#78C8DE", 0.60);
 
     /**
      * The size of each cell in pixels.
@@ -82,6 +103,9 @@ public class PlacementController {
     @FXML
     private Button startMatchButton;
 
+    @FXML
+    private Label orientationLabel;
+
     /**
      * The game model instance.
      */
@@ -91,6 +115,9 @@ public class PlacementController {
      * Flag indicating whether the current orientation is horizontal.
      */
     private boolean horizontal = true;
+
+    /**Type of user selected*/
+    private String typeOfUser;
 
     /**
      * The size of the game board (10x10).
@@ -117,11 +144,40 @@ public class PlacementController {
      * @param game the game model created by {@link StartController}
      * @param playerName the name of the human player
      */
-    public void initGame(Game game, String playerName){
+    public void initGame(Game game, String playerName ,String typeOfUser){
         this.gameModel = game;
+        this.typeOfUser=typeOfUser;
         gameModel.startPlacement(playerName);
         pendingShipsListView.setItems(FXCollections.observableArrayList(gameModel.getPlayerHuman().getShips()));
+        configureShipListView();
         setDragFromListView();
+    }
+
+    private void configureShipListView() {
+
+        pendingShipsListView.setCellFactory(list -> new ListCell<Ship>() {
+
+            private final ImageView imageView = new ImageView();
+
+            @Override
+            protected void updateItem(Ship ship, boolean empty) {
+                super.updateItem(ship, empty);
+
+                if (empty || ship == null) {
+                    setGraphic(null);
+                    setText(null);
+                    return;
+                }
+
+                Image image = CARD_SHIP_IMAGES.get(ship.getType());
+
+                imageView.setImage(image);
+                imageView.setPreserveRatio(true);
+
+                setGraphic(imageView);
+                setText(null);
+            }
+        });
     }
 
     /**
@@ -133,9 +189,8 @@ public class PlacementController {
         for (int row = 0; row < SIZE; row++){
             for (int column = 0; column < SIZE; column++){
                 StackPane visualCell = new StackPane();
-                Rectangle background = new Rectangle(35, 35);
-                background.setFill(Color.LIGHTBLUE);
-                background.setStroke(Color.GRAY);
+                Rectangle background = new Rectangle(50, 50);
+                styleNormalCell(background,row,column);
                 visualCell.getChildren().add(background);
 
                 final int f = row;
@@ -149,6 +204,24 @@ public class PlacementController {
     }
 
     /**
+     * Set a style to a rectangle that represent a cell
+     * @param cell rectangle passed
+     * @param row row of the rectangle
+     * @param column column of the rectangle
+     */
+
+    private void styleNormalCell(Rectangle cell, int row, int column) {
+        cell.setFill(((row + column) & 1) == 0 ? CELL_A : CELL_B);
+        cell.setStroke(CELL_STROKE);
+        cell.setStrokeWidth(0.9);
+        cell.setArcWidth(6);
+        cell.setArcHeight(6);
+        cell.setEffect(null);
+        cell.setScaleX(1.0);
+        cell.setScaleY(1.0);
+    }
+
+    /**
      * Enables dragging a ship out of the pending ships list view. The
      * currently selected ship's type is stored on the {@link Dragboard}
      * so the drop target can identify what is being dragged, although
@@ -159,7 +232,6 @@ public class PlacementController {
         pendingShipsListView.setOnDragDetected(event -> {
             Ship shipSelected = pendingShipsListView.getSelectionModel().getSelectedItem();
             if (shipSelected == null) return;
-
             Dragboard dragboard = pendingShipsListView.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
             content.putString(shipSelected.getType());
@@ -175,6 +247,8 @@ public class PlacementController {
     @FXML
     private void onRotateButton(){
         horizontal = !horizontal;
+        if(horizontal) orientationLabel.setText("↔");
+        else orientationLabel.setText("↕");
     }
 
     /**
@@ -224,6 +298,7 @@ public class PlacementController {
                 drawShip(shipSelected, row, column);
                 pendingShipsListView.getItems().remove(shipSelected);
                 if (playerHuman.isFleetFullyPlaced()){
+                    rotateButton.setDisable(true);
                     startMatchButton.setDisable(false);
                 }
             } catch (InvalidPositionException e){
@@ -274,13 +349,7 @@ public class PlacementController {
      */
     private Node createShipShape(Ship ship, boolean horizontal){
         Image image = SHIP_IMAGES.get(ship.getType());
-
-        double mayorLong = ship.getSize() * CELL_SIZE + (ship.getSize() - 1) * GAP;
-        double minorLong = CELL_SIZE - 6;
-
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(mayorLong);
-        imageView.setFitHeight(minorLong);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
 
@@ -305,14 +374,14 @@ public class PlacementController {
     private void changePlayGameView(ActionEvent event){
         try{
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/com/examplez/demo/PlayView.fxml"));
+                    new FXMLLoader(getClass().getResource("/com/examplez/demo/play-match-view.fxml"));
 
             Parent root = loader.load();
 
             PlayController controller = loader.getController();
 
             controller.setGameModel(gameModel);
-
+            controller.setTypeOfUser(typeOfUser);
             controller.loadBoard();
 
             Stage stage =

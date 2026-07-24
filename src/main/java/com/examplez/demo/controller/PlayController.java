@@ -6,6 +6,7 @@ import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -29,36 +30,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 import java.io.IOException;
-/*
-package com.examplez.demo.controller;
-import com.examplez.demo.model.Ship;
-import javafx.animation.PauseTransition;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Rectangle;
-import com.examplez.demo.model.Board;
-import com.examplez.demo.model.Cell;
-import com.examplez.demo.model.Game;
-import javafx.fxml.FXML;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.io.IOException;
-import java.util.List;
- */
 
 /**
- * Controller for the play view (PlayView.fxml), where the shooting
+ * Controller for the play view (play-match-view.fxml), where the shooting
  * phase of the match takes place.
  * <p>
  * Manages two boards: the main board (the machine's territory, where
@@ -77,17 +51,26 @@ public class PlayController {
 
     static {
         SHIP_IMAGES.put("carrier",
-                new Image(PlayController.class.getResourceAsStream("/cards/carrier.png")));
+                new Image(PlayController.class.getResourceAsStream("/Images/carrier.png")));
 
         SHIP_IMAGES.put("submarine",
-                new Image(PlayController.class.getResourceAsStream("/cards/submarine.png")));
+                new Image(PlayController.class.getResourceAsStream("/Images/submarine.png")));
 
         SHIP_IMAGES.put("destructor",
-                new Image(PlayController.class.getResourceAsStream("/cards/destructor.png")));
+                new Image(PlayController.class.getResourceAsStream("/Images/destructor.png")));
 
         SHIP_IMAGES.put("frigate",
-                new Image(PlayController.class.getResourceAsStream("/cards/frigate.png")));
+                new Image(PlayController.class.getResourceAsStream("/Images/frigate.png")));
     }
+    /**color of one cell.*/
+    private static final Color CELL_A =
+            Color.web("#315B79", 0.72);
+    /**color of one cell.*/
+    private static final Color CELL_B =
+            Color.web("#3A6782", 0.68);
+    /**border of one cell.*/
+    private static final Color CELL_STROKE =
+            Color.web("#78C8DE", 0.60);
 
     /**
      * The size of each cell in pixels.
@@ -131,6 +114,10 @@ public class PlayController {
      */
     private Game gameModel;
 
+    /**Type of user selected by the user*/
+    private String typeOfUser;
+
+
     /**
      * JavaFX lifecycle method, called automatically right after the FXML
      * is loaded. Builds the empty visual cells for both boards.
@@ -152,6 +139,10 @@ public class PlayController {
         this.gameModel = gameModel;
     }
 
+    public void setTypeOfUser(String typeOfUser) {
+        this.typeOfUser = typeOfUser;
+    }
+
     /**
      * Creates the 100 visual cells of a board as {@link StackPane} nodes
      * and adds them to the given grid.
@@ -164,9 +155,8 @@ public class PlayController {
         for (int row = 0; row < 10; row++) {
             for (int column = 0; column < 10; column++) {
                 StackPane VisualCell = new StackPane();
-                Rectangle background = new Rectangle(35, 35);
-                background.setFill(Color.LIGHTBLUE);
-                background.setStroke(Color.GRAY);
+                Rectangle background = new Rectangle(50, 50);
+                styleNormalCell(background,row,column);
                 VisualCell.getChildren().add(background);
 
                 if (allowClick) {
@@ -181,6 +171,24 @@ public class PlayController {
     }
 
     /**
+     * Set a style to a rectangle that represent a cell
+     * @param cell rectangle passed
+     * @param row row of the rectangle
+     * @param column column of the rectangle
+     */
+
+    private void styleNormalCell(Rectangle cell, int row, int column) {
+        cell.setFill(((row + column) & 1) == 0 ? CELL_A : CELL_B);
+        cell.setStroke(CELL_STROKE);
+        cell.setStrokeWidth(0.9);
+        cell.setArcWidth(6);
+        cell.setArcHeight(6);
+        cell.setEffect(null);
+        cell.setScaleX(1.0);
+        cell.setScaleY(1.0);
+    }
+
+    /**
      * Builds the 2D figure used to represent a ship on the board.
      *
      * @param ship       the ship to build a figure for
@@ -188,25 +196,24 @@ public class PlayController {
      * @return a node representing the ship, ready to be added to the board grid
      */
     private Node createShipShape(Ship ship, boolean horizontal) {
-        javafx.scene.image.Image image = SHIP_IMAGES.get(ship.getType());
-
-        double mayorLong = ship.getSize() * CELL_SIZE + (ship.getSize() - 1) * GAP;
-        double minorLong = CELL_SIZE - 6;
+        Image image = SHIP_IMAGES.get(ship.getType());
 
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(mayorLong);
-        imageView.setFitHeight(minorLong);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
 
+        imageView.setMouseTransparent(true);
+
         Node shipNode = imageView;
+
         if (!horizontal) {
             imageView.setRotate(90);
             shipNode = new Group(imageView);
         }
 
         StackPane container = new StackPane(shipNode);
-        container.setPickOnBounds(false);
+
+        container.setMouseTransparent(true);
         return container;
     }
 
@@ -233,27 +240,18 @@ public class PlayController {
         drawMainBoard();
 
         if (!machineBoard.isBoardWithShips()) {
-            changeFinalView("¡You Win!");
+            changeFinalView("YOU WIN!","COMMAND CHANNEL SECURE");
             return;
         }
 
         if (result.equals(Board.WATER)) {
             playerTurn = false;
-            turnLabel.setText("Turno: Máquina");
+            turnLabel.setText("TURN: MACHINE");
             machineTurnLoop();
         }
         // if HIT or SUNKEN, the player keeps shooting (nothing else to do)
     }
 
-    /**
-     * Announces the winner of the match. (Placeholder — will later
-     * transition to a FinalController view.)
-     *
-     * @param winner the name or message indicating the winner
-     */
-    private void showWinner(String winner) {
-        // Not yet implemented
-    }
 
     /**
      * Draws the initial state of both boards from the game model. Must
@@ -265,8 +263,7 @@ public class PlayController {
         drawMainBoard();
         drawPositionBoard();
         drawPlayerShips();
-        // It runs gameModel.getPlayerHuman().getBoard() and gameModel.getPlayerMachine().getBoard()
-        // and draws the cells already initialized on the grid pane.
+        if(typeOfUser.equals("Verificator")) drawMachineShips();
     }
 
     /**
@@ -283,10 +280,9 @@ public class PlayController {
                 Rectangle background = (Rectangle) mainCells[row][column].getChildren().get(0);
 
                 switch (state) {
-                    case Board.WATER -> background.setFill(Color.BLUE);      // water mark (X) would be added separately
-                    case Board.HIT -> background.setFill(Color.ORANGE);
-                    case Board.SUNKEN -> background.setFill(Color.DARKRED);
-                    default -> background.setFill(Color.LIGHTBLUE); // EMPTY or hidden SHIP: looks the same as water
+                    case Board.WATER -> background.setFill(Color.web("#181e30"));      // watermark (X) would be added separately
+                    case Board.HIT -> drawHitMarker(row,column,mainBoardGrid);
+                    case Board.SUNKEN -> drawSunkenMarker(row,column,mainBoardGrid);
                 }
             }
         }
@@ -307,10 +303,9 @@ public class PlayController {
                 Rectangle background = (Rectangle) positionCells[row][column].getChildren().get(0);
 
                 switch (state) {
-                    case Board.WATER -> background.setFill(Color.BLUE);
-                    case Board.HIT -> drawHitMarker(row, column);
-                    case Board.SUNKEN -> drawSunkenMarker(row, column);
-                    default -> background.setFill(Color.LIGHTBLUE);
+                    case Board.WATER -> background.setFill(Color.web("#181E30"));
+                    case Board.HIT -> drawHitMarker(row, column,positionBoardGrid);
+                    case Board.SUNKEN -> drawSunkenMarker(row, column,positionBoardGrid);
                 }
             }
         }
@@ -357,22 +352,67 @@ public class PlayController {
     }
 
     /**
+     * Draws the  machine player's own ships on the position board.
+     * Only the starting cell of each ship is used to place the entire figure.
+     */
+    private void drawMachineShips() {
+        List<List<Cell>> board = gameModel.getPlayerMachine().getBoard().getCells();
+
+        for (int row = 0; row < 10; row++) {
+            for (int column = 0; column < 10; column++) {
+                Cell cell = board.get(row).get(column);
+                if (cell.getShip() == null) {
+                    continue;
+                }
+
+                Ship ship = cell.getShip();
+
+                // Is this the start of the ship?
+                boolean sameUp = row > 0 && board.get(row - 1).get(column).getShip() == ship;
+                boolean sameLeft = column > 0 && board.get(row).get(column - 1).getShip() == ship;
+
+                if (sameUp || sameLeft) {
+                    continue;
+                }
+
+                // Detect orientation
+                boolean horizontal = column + 1 < 10 && board.get(row).get(column + 1).getShip() == ship;
+
+                Node figure = createShipShape(ship, horizontal);
+
+                GridPane.setRowIndex(figure, row);
+                GridPane.setColumnIndex(figure, column);
+
+                GridPane.setColumnSpan(figure, horizontal ? ship.getSize() : 1);
+                GridPane.setRowSpan(figure, horizontal ? 1 : ship.getSize());
+
+                mainBoardGrid.getChildren().add(figure);
+            }
+        }
+    }
+
+
+    /**
      * Draws a hit marker (✕) on the given cell of the position board.
      *
      * @param row    the row index
      * @param column the column index
      */
-    private void drawHitMarker(int row, int column) {
-        StackPane cell = positionCells[row][column];
+    private void drawHitMarker(int row, int column, GridPane board) {
+        removeMarker(board, row, column);
+
         Label mark = new Label("✕");
+        mark.setId("boardMark");
+        mark.setMouseTransparent(true);
+
         mark.setStyle("""
-        -fx-font-size:22;
-        -fx-font-weight:bold;
-        -fx-text-fill:red;
+        -fx-font-size: 30px;
+        -fx-font-weight: bold;
+        -fx-text-fill: orange;
         """);
-        if (cell.getChildren().size() == 1) {
-            cell.getChildren().add(mark);
-        }
+
+        board.add(mark, column, row);
+        mark.toFront();
     }
 
     /**
@@ -381,17 +421,21 @@ public class PlayController {
      * @param row    the row index
      * @param column the column index
      */
-    private void drawSunkenMarker(int row, int column) {
-        StackPane cell = positionCells[row][column];
+    private void drawSunkenMarker(int row, int column, GridPane board) {
+        removeMarker(board, row, column);
+
         Label mark = new Label("☠");
+        mark.setId("boardMark");
+        mark.setMouseTransparent(true);
+
         mark.setStyle("""
-        -fx-font-size:18;
-        -fx-text-fill:black;
-        -fx-font-weight:bold;
+        -fx-font-size: 30px;
+        -fx-text-fill: #ff657b;
+        -fx-font-weight: bold;
         """);
-        if (cell.getChildren().size() == 1) {
-            cell.getChildren().add(mark);
-        }
+
+        board.add(mark, column, row);
+        mark.toFront();
     }
 
     /**
@@ -400,23 +444,23 @@ public class PlayController {
      * turn passes back to the player.
      */
     private void machineTurnLoop() {
-        PauseTransition pause = new PauseTransition(Duration.millis(600));
+        PauseTransition pause = new PauseTransition(Duration.millis(1000));
         pause.setOnFinished(event -> {
-            turnLabel.setText("Turno: maquina");
+            turnLabel.setText("TURN: MACHINE");
             gameModel.processMachineAttack(); // still void, unchanged
             drawPositionBoard();
 
             Board humanBoard = gameModel.getPlayerHuman().getBoard();
 
             if (!humanBoard.isBoardWithShips()) {
-                changeFinalView("¡machine Wins!");
+                changeFinalView("MACHINE WINS!" , "COMMAND CHANNEL LOST");
                 return;
             }
 
             String lastResult = humanBoard.getStateLastCellAttacked();
             if (lastResult.equals(Board.WATER)) {
                 playerTurn = true; // turn returns to the player
-                turnLabel.setText("Turno: Jugador");
+                turnLabel.setText("TURN: PLAYER");
             } else {
                 machineTurnLoop(); // machine keeps shooting (HIT or SUNKEN)
             }
@@ -429,20 +473,38 @@ public class PlayController {
      *
      * @param winner the winner message to display
      */
-    private void changeFinalView(String winner) {
+    private void changeFinalView(String winner , String status) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/FinalView.fxml"));
             Parent root = loader.load();
 
             FinalController controller = loader.getController();
             controller.setWinner(winner);
+            controller.setStatus(status);
 
             Stage stage = (Stage) mainBoardGrid.getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.centerOnScreen();
+            stage.setResizable(false);
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void removeMarker(GridPane board, int row, int column) {
+        board.getChildren().removeIf(node -> {
+            Integer nodeRow = GridPane.getRowIndex(node);
+            Integer nodeColumn = GridPane.getColumnIndex(node);
+
+            int currentRow = nodeRow == null ? 0 : nodeRow;
+            int currentColumn = nodeColumn == null ? 0 : nodeColumn;
+
+            return node instanceof Label label
+                    && "boardMark".equals(label.getId())
+                    && currentRow == row
+                    && currentColumn == column;
+        });
     }
 }
