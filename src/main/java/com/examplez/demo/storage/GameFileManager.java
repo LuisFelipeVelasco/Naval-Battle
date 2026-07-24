@@ -1,11 +1,14 @@
-package com.examplez.demo;
+package com.examplez.demo.storage;
+
+import com.examplez.demo.storage.exceptions.GameLoadException;
+import com.examplez.demo.storage.exceptions.GameSaveException;
 
 import java.io.*;
 
 /**
  * Utility class responsible for managing persistent game storage operations.
  *
- * <p><b>Design Pattern - Facade (Structural):</b> This class acts as a Facade that provides
+ * <p><b>Design Pattern - Facade:</b> This class acts as a Facade that provides
  * a simplified, unified interface to handle persistent storage. It hides the complexity of
  * managing two separate I/O subsystems:
  * <ul>

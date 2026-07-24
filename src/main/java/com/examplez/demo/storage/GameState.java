@@ -1,10 +1,8 @@
-package com.examplez.demo;
+package com.examplez.demo.storage;
 
 import com.examplez.demo.model.Board;
-import com.examplez.demo.model.Ship;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Data Transfer Object that represents the stage of the game's state in this turn.

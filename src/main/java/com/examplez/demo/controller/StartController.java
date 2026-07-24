@@ -1,7 +1,7 @@
 package com.examplez.demo.controller;
 
-import com.examplez.demo.GameFileManager;
-import com.examplez.demo.GameState;
+import com.examplez.demo.storage.GameFileManager;
+import com.examplez.demo.storage.GameState;
 import com.examplez.demo.model.Game;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
