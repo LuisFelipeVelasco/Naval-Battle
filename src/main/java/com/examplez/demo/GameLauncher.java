@@ -18,6 +18,7 @@ public class GameLauncher extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 1100, 720);
         stage.setTitle("menu");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.centerOnScreen();
         stage.show();
     }

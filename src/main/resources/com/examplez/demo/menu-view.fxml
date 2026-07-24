@@ -58,7 +58,7 @@
 
                         <TextField fx:id="playerNameField" maxWidth="1.7976931348623157E308" prefHeight="52.0" promptText="ENTER COMMANDER NAME" styleClass="commander-field" />
 
-                        <Label styleClass="field-hint" text="Your callsign will appear in the tactical combat log." wrapText="true" />
+                        <Label fx:id="labelName" prefHeight="24.0" prefWidth="446.0" styleClass="field-hint" wrapText="true" />
 
                         <Region prefHeight="3.0" />
 

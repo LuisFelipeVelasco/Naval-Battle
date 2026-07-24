@@ -12,105 +12,144 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
             minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="520.0" prefWidth="760.0"
+            prefHeight="720.0" prefWidth="1100.0"
+            styleClass="placement-root, placement-space"
             stylesheets="@place-ships-style.css"
-            styleClass="placement-root, placement-clean"
             xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.examplez.demo.controller.PlacementController">
 
     <top>
-        <VBox alignment="CENTER" spacing="3.0" styleClass="mission-header"
+        <VBox alignment="CENTER" spacing="4.0"
+              styleClass="mission-header"
               BorderPane.alignment="CENTER">
             <padding>
-                <Insets top="16.0" right="24.0" bottom="14.0" left="24.0" />
+                <Insets bottom="15.0" left="24.0" right="24.0" top="17.0" />
             </padding>
 
-            <HBox alignment="CENTER" spacing="9.0">
-                <Region prefWidth="42.0" prefHeight="1.0" styleClass="header-line" />
-                <Label text="FLEET DEPLOYMENT // PHASE 02" styleClass="eyebrow" />
-                <Region prefWidth="42.0" prefHeight="1.0" styleClass="header-line-reversed" />
+            <HBox alignment="CENTER" spacing="11.0">
+                <Region prefHeight="2.0" prefWidth="52.0"
+                        styleClass="header-line" />
+                <Label styleClass="eyebrow"
+                       text="FLEET DEPLOYMENT // PHASE 02" />
+                <Region prefHeight="2.0" prefWidth="52.0"
+                        styleClass="header-line-reversed" />
             </HBox>
 
-            <Label text="BATTLESHIP" styleClass="screen-title" />
-            <Label text="Place your fleet before starting the match"
-                   styleClass="screen-subtitle" />
+            <Label styleClass="screen-title" text="BATTLESHIP" />
+            <Label styleClass="screen-subtitle"
+                   text="Place your fleet before starting the match" />
         </VBox>
     </top>
 
     <center>
-        <VBox alignment="CENTER" spacing="7.0" styleClass="board-zone"
+        <VBox alignment="CENTER" spacing="8.0"
+              styleClass="board-zone"
               BorderPane.alignment="CENTER">
             <padding>
-                <Insets top="10.0" right="16.0" bottom="12.0" left="16.0" />
+                <Insets bottom="13.0" left="16.0"
+                        right="16.0" top="12.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" maxWidth="420.0" spacing="7.0"
+            <HBox alignment="CENTER_LEFT"
+                  maxWidth="548.0"
+                  spacing="8.0"
                   styleClass="board-caption">
-                <Region prefWidth="7.0" prefHeight="7.0"
-                        minWidth="7.0" minHeight="7.0"
-                        maxWidth="7.0" maxHeight="7.0"
+
+                <Region maxHeight="9.0" maxWidth="9.0"
+                        minHeight="9.0" minWidth="9.0"
+                        prefHeight="9.0" prefWidth="9.0"
                         styleClass="board-status-dot" />
-                <Label text="DEPLOYMENT ZONE" styleClass="board-caption-title" />
+
+                <Label styleClass="board-caption-title"
+                       text="DEPLOYMENT ZONE" />
+
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="TACTICAL GRID" styleClass="board-caption-meta" />
+
+                <Label styleClass="board-caption-meta"
+                       text="TACTICAL GRID // 10 × 10" />
             </HBox>
 
-            <GridPane fx:id="boardGrid" alignment="CENTER"
+            <GridPane fx:id="boardGrid"
+                      alignment="CENTER"
                       hgap="3.0" vgap="3.0"
-                      maxWidth="420.0" maxHeight="420.0"
+                      maxHeight="548.0"
+                      maxWidth="548.0"
                       styleClass="board-grid" />
 
-            <Label text="DRAG A SHIP OVER THE GRID TO PREVIEW IT"
-                   styleClass="board-hint" />
+            <Label styleClass="board-hint"
+                   text="DRAG A SHIP OVER THE GRID TO PREVIEW ITS POSITION" />
         </VBox>
     </center>
 
     <right>
-        <VBox prefWidth="400.0" spacing="11.0" styleClass="fleet-panel"
+        <VBox prefHeight="528.0"
+              prefWidth="500.0"
+              spacing="12.0"
+              styleClass="fleet-panel"
               BorderPane.alignment="CENTER">
             <padding>
-                <Insets top="18.0" right="17.0" bottom="18.0" left="17.0" />
+                <Insets bottom="19.0" left="18.0"
+                        right="18.0" top="19.0" />
             </padding>
 
-            <HBox alignment="CENTER_LEFT" spacing="7.0">
-                <Region prefWidth="5.0" prefHeight="22.0" styleClass="section-accent" />
-                <VBox spacing="0.0">
-                    <Label text="PENDING FLEET" styleClass="panel-title" />
-                    <Label text="SELECT AND DEPLOY" styleClass="panel-kicker" />
+            <HBox alignment="CENTER_LEFT" spacing="9.0">
+                <Region prefHeight="29.0"
+                        prefWidth="5.0"
+                        styleClass="section-accent" />
+
+                <VBox spacing="1.0">
+                    <Label styleClass="panel-title"
+                           text="PENDING FLEET" />
+                    <Label styleClass="panel-kicker"
+                           text="SELECT AND DEPLOY" />
                 </VBox>
+
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="READY" styleClass="ready-badge" />
+
+                <Label styleClass="ready-badge" text="READY" />
             </HBox>
 
-            <ListView id="ShipListView" fx:id="pendingShipsListView"
-                      prefHeight="255.0" prefWidth="184.0"
-                      VBox.vgrow="ALWAYS"
-                      styleClass="ship-list" />
+            <ListView id="ShipListView"
+                      fx:id="pendingShipsListView"
+                      prefHeight="360.0"
+                      prefWidth="464.0"
+                      styleClass="ship-list"
+                      VBox.vgrow="ALWAYS" />
 
-            <HBox alignment="CENTER_LEFT" spacing="7.0" styleClass="orientation-status">
-                <Label text="ORIENTATION" styleClass="orientation-label" />
+            <HBox alignment="CENTER_LEFT"
+                  spacing="8.0"
+                  styleClass="orientation-status">
+
+                <Label styleClass="orientation-label"
+                       text="ORIENTATION" />
+
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="↔" styleClass="orientation-icon" />
-                <Label text="CHANGE" styleClass="orientation-value" />
+
+                <Label fx:id="orientationLabel"
+                       styleClass="orientation-icon"
+                       text="↔" />
+
+                <Label styleClass="orientation-value"
+                       text="CHANGE" />
             </HBox>
 
-            <VBox spacing="8.0">
+            <VBox spacing="9.0">
                 <Button fx:id="rotateButton"
                         maxWidth="Infinity"
-                        prefHeight="39.0"
                         mnemonicParsing="false"
                         onAction="#onRotateButton"
-                        text="ROTATE SHIP"
-                        styleClass="action-button, rotate-button" />
+                        prefHeight="46.0"
+                        styleClass="action-button, rotate-button"
+                        text="ROTATE SHIP" />
 
                 <Button fx:id="startMatchButton"
                         maxWidth="Infinity"
-                        prefHeight="45.0"
                         mnemonicParsing="false"
                         onAction="#onStartMatchButton"
-                        text="START MATCH"
-                        styleClass="action-button, start-match-button" />
+                        prefHeight="54.0"
+                        styleClass="action-button, start-match-button"
+                        text="START MATCH" />
             </VBox>
         </VBox>
     </right>

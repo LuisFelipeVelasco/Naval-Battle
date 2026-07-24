@@ -10,10 +10,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,27 +30,35 @@ import java.util.Optional;
  */
 public class StartController {
 
-    @FXML private Button InitialButton;
+    /**
+     * Text field where the player enters their name.
+     */
+    @FXML
+    private TextField playerNameField;
+
+    /** Label
+     * Button that starts a new game.
+     */
+    @FXML
+    private Button InitialButton;
+
+    @FXML
+    private Label labelName;
 
     @FXML Button loadGameButton;
 
     @FXML Label statusLabel;
 
-    @FXML TextField playerNameField;
 
     /**
-     * Handles the action event for starting a new game.
-     * <p>
-     * If a saved game session already exists, displays a confirmation alert warning the player
-     * that their previous progress will be overwritten and lost. If confirmed, the old save file
-     * is deleted before transitioning to the ship placement view.
-     * </p>
+     * Handles the "Start Game" action. Validates that the player name is not empty,
+     * then transitions to the ship placement view with a new game.
      *
      * @param event the {@link ActionEvent} triggered by clicking the start new game button
-     * @throws IOException if the FXML layout file for ship placement fails to load
+     * @throws IOException if the placement view FXML cannot be loaded
      */
     @FXML
-    public void handleStartGame(ActionEvent event) throws  IOException{
+    public void handleStartGame(ActionEvent event) throws IOException {
         if (GameFileManager.isAGameSaved()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Overwrite save file");
@@ -59,7 +72,14 @@ public class StartController {
             // Si confirma, se elimina la partida anterior
             GameFileManager.deleteGame();
         }
-        changeGameView(event);
+
+        String playerName = playerNameField.getText().trim();
+        if (!playerName.isEmpty()) {
+            String typeOfUser=askTypeOfUser();
+            changeGameView(event,typeOfUser);
+        }
+        labelName.setText("First , identify yourself command !");
+
     }
 
     /**
@@ -146,7 +166,7 @@ public class StartController {
 
             //TASK: descomentar esta línea de código una vez se implementen los setter y getters para nickname en Player
             //gameModel.getPlayerHuman().setNickname(nickname);
-            
+
             String fxml = "/com/examplez.demo/PlayView.fxml";
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             Parent root = loader.load();
@@ -174,6 +194,15 @@ public class StartController {
         }
     }
 
+    public String askTypeOfUser() {
+        ChoiceDialog<String> dialog =
+                new ChoiceDialog<>("Player", List.of("Player", "Verificator"));
+        dialog.setTitle("Ace");
+        dialog.setHeaderText("Choose the value of the Ace");
+        dialog.setContentText("Value:");
+        return dialog.showAndWait().orElse("Player");
+    }
+
     /**
      * Switches the current scene to the ship placement view, starting a
      * new match: creates a new {@link Game}, creates both the human and
@@ -183,21 +212,18 @@ public class StartController {
      * @param event the action event used to obtain the current {@link Stage}
      * @throws IOException if the placement view FXML cannot be loaded
      */
-    private void changeGameView(ActionEvent event) throws IOException {
-        String fxml = "/com/examplez/demo/place-ships-View.fxml";
+    private void changeGameView(ActionEvent event ,String typeOfUser) throws IOException {
+        String fxml = "/com/examplez/demo/place-ships-view.fxml";
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
         Parent root = loader.load();
         PlacementController controller = loader.getController();
         Game newGame = new Game();
+        String playerName = playerNameField.getText().trim();
 
-        //TASK: Uncomment the lines once the getter and setter methods for nickname are implemented in PlayerHuman.
-        /*if (playerNameField != null && !playerNameField.getText().isBlank()) {
-            newGame.getPlayerHuman().setNickname(playerNameField.getText().trim());
-        }*/
-
-        controller.initGame(newGame);
+        controller.initGame(newGame, playerName , typeOfUser);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root,860,650));
+        stage.setScene(new Scene(root, 1200, 920));
+        stage.setResizable(false);
         stage.centerOnScreen();
         stage.setTitle("placement");
         stage.show();

@@ -139,7 +139,7 @@
 
 .field-hint {
     -fx-text-fill: rgba(174, 200, 216, 0.58);
-    -fx-font-size: 10px;
+    -fx-font-size: 20px;
 }
 
 /* Text field: normal, hover and focused states. */
