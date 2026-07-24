@@ -4,8 +4,18 @@ import java.io.*;
 
 /**
  * Utility class responsible for managing persistent game storage operations.
- * Handles reading, writing, checking, and deleting serializable game states
- * and text-based game statistics (turn, ships sunk, and player nickname).
+ *
+ * <p><b>Design Pattern - Facade (Structural):</b> This class acts as a Facade that provides
+ * a simplified, unified interface to handle persistent storage. It hides the complexity of
+ * managing two separate I/O subsystems:
+ * <ul>
+ *   <li><b>Binary Serialization Subsystem:</b> Handles complex state persistence using
+ *       {@link ObjectOutputStream} and {@link ObjectInputStream} for {@link GameState}.</li>
+ *   <li><b>Flat Text File Subsystem:</b> Handles lightweight game metrics (turn, sunk ships,
+ *       player nickname) using {@link BufferedWriter} and {@link BufferedReader} formatted as CSV.</li>
+ * </ul>
+ * Controllers (clients) interact exclusively with this Facade, remaining entirely decoupled
+ * from the underlying file structures, parsing rules, and I/O exception handling.</p>
  *
  * <p>This class cannot be instantiated.</p>
  */
