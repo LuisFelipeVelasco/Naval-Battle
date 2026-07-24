@@ -8,7 +8,12 @@ package com.examplez.demo.model;
  * the rest of the code never has to remember or repeat the size that
  * corresponds to each ship type.
  */
-public class ShipFactory {
+public final class ShipFactory {
+
+    /** Prevents construction of this static factory. */
+    private ShipFactory() {
+        throw new UnsupportedOperationException("ShipFactory cannot be instantiated.");
+    }
 
     /**
      * Creates a new {@link Ship} of the given type with the specified ID,

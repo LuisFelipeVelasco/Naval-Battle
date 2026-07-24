@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -59,13 +60,13 @@ public class PlacementController {
         CARD_SHIP_IMAGES.put("destructor", new Image(PlacementController.class.getResourceAsStream("/cards/destructor.png")));
         CARD_SHIP_IMAGES.put("frigate", new Image(PlacementController.class.getResourceAsStream("/cards/frigate.png")));
     }
-    /**color of one cell.*/
+    /** Alternating fill colour for even board cells. */
     private static final Color CELL_A =
             Color.web("#315B79", 0.72);
-    /**color of one cell.*/
+    /** Alternating fill colour for odd board cells. */
     private static final Color CELL_B =
             Color.web("#3A6782", 0.68);
-    /**border of one cell.*/
+    /** Border colour applied to every board cell. */
     private static final Color CELL_STROKE =
             Color.web("#78C8DE", 0.60);
 
@@ -106,17 +107,21 @@ public class PlacementController {
     @FXML
     private Label orientationLabel;
 
+    /** Label that identifies the commander during fleet deployment. */
+    @FXML
+    private Label commanderLabel;
+
     /**
      * The game model instance.
      */
-    Game gameModel;
+    private Game gameModel;
 
     /**
      * Flag indicating whether the current orientation is horizontal.
      */
     private boolean horizontal = true;
 
-    /**Type of user selected*/
+    /** Visibility mode selected for the match. */
     private String typeOfUser;
 
     /**
@@ -148,6 +153,7 @@ public class PlacementController {
         this.gameModel = game;
         this.typeOfUser=typeOfUser;
         gameModel.startPlacement(playerName);
+        commanderLabel.setText("COMMANDER: " + playerName.toUpperCase() + " // DEPLOY YOUR FLEET");
         pendingShipsListView.setItems(FXCollections.observableArrayList(gameModel.getPlayerHuman().getShips()));
         configureShipListView();
         setDragFromListView();
@@ -310,13 +316,16 @@ public class PlacementController {
     }
 
     /**
-     * Displays an error message to the user in a simple alert dialog.
-     * (Currently not implemented - placeholder for future enhancement.)
+     * Displays an invalid-placement message to the commander.
      *
      * @param message the error message to display
      */
     private void showError(String message){
-        // Alert simple o Label / Simple alert or Label
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Invalid Fleet Position");
+        alert.setHeaderText("The ship cannot be deployed there.");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     /**
@@ -380,9 +389,7 @@ public class PlacementController {
 
             PlayController controller = loader.getController();
 
-            controller.setGameModel(gameModel);
-            controller.setTypeOfUser(typeOfUser);
-            controller.loadBoard();
+            controller.startSession(gameModel, typeOfUser);
 
             Stage stage =
                     (Stage)((Node)event.getSource()).getScene().getWindow();

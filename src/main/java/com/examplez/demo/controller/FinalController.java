@@ -21,17 +21,25 @@ import java.io.IOException;
  */
 public class FinalController {
 
+    /** Label that highlights the winner. */
     @FXML
-    Label WinnerLabel;
+    private Label WinnerLabel;
 
+    /** Button that returns to the menu. */
     @FXML
-    Button newGame;
+    private Button newGame;
 
+    /** Button that closes the application. */
     @FXML
-    Button closeGame;
+    private Button closeGame;
 
+    /** Label that displays the final mission status. */
     @FXML
-    Label statusLabel;
+    private Label statusLabel;
+
+    /** Label that displays the last commander's nickname. */
+    @FXML
+    private Label nicknameLabel;
 
     /**
      * Handles the event when the "New Game" button is selected.
@@ -80,6 +88,15 @@ public class FinalController {
      */
     public void setStatus(String status) {
         statusLabel.setText(status);
+    }
+
+    /**
+     * Displays the commander who completed the match.
+     *
+     * @param nickname commander's nickname
+     */
+    public void setNickname(String nickname) {
+        nicknameLabel.setText("COMMANDER: " + nickname.toUpperCase());
     }
 
 }

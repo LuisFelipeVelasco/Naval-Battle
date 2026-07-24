@@ -1,86 +1,92 @@
 package com.examplez.demo;
 
 import com.examplez.demo.model.Board;
+import com.examplez.demo.model.Game;
+import com.examplez.demo.model.Ship;
+import com.examplez.demo.model.ShipFactory;
 import com.examplez.demo.storage.GameFileManager;
 import com.examplez.demo.storage.GameState;
 import com.examplez.demo.storage.exceptions.GameLoadException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for the {@link GameFileManager} class.
- * Ensures proper functionality for saving, loading, checking, and deleting game sessions
- * along with game statistics (turn, sunk ships count, and player nickname).
- */
+/** Tests exact active-session persistence through {@link GameFileManager}. */
 class GameFileManagerTest {
 
-    /**
-     * Cleans up any existing save files before and after each test
-     * to guarantee an isolated test environment.
-     */
+    /** Temporary directory used to isolate each save-file test. */
+    private Path temporaryDirectory;
+
+    /** Creates a private save location before each test. */
     @BeforeEach
+    void setUp() throws Exception {
+        temporaryDirectory = Files.createTempDirectory("naval-battle-test-");
+        System.setProperty(GameFileManager.SAVE_DIRECTORY_PROPERTY, temporaryDirectory.toString());
+    }
+
+    /** Removes persisted test state after each test. */
     @AfterEach
-    void cleanUp() {
+    void tearDown() throws Exception {
         GameFileManager.deleteGame();
+        System.clearProperty(GameFileManager.SAVE_DIRECTORY_PROPERTY);
+        Files.deleteIfExists(temporaryDirectory);
     }
 
+    /** Verifies nickname, turn, ships and attacked states survive serialization. */
     @Test
-    @DisplayName("Should successfully save and restore game state, turn, ships sunk, and nickname")
-    void testSaveAndLoadAllData() {
-        Board playerBoard = new Board(10);
-        Board machineBoard = new Board(10);
-        GameState initialState = new GameState(playerBoard, machineBoard);
+    void savesAndRestoresTheCompleteActiveMatch() throws Exception {
+        Game game = createActiveGame();
+        Board enemyBoard = game.getPlayerMachine().getBoard();
+        int[] waterTarget = findWaterTarget(enemyBoard);
+        enemyBoard.attackCell(waterTarget[0], waterTarget[1]);
+        GameFileManager.saveGame(new GameState(game, false, "Verifier"));
 
-        int expectedTurn = 5;
-        int expectedShipsSunk = 3;
-        String expectedNickname = "CaptainJava";
+        GameState restored = GameFileManager.loadGame();
 
-        GameFileManager.saveGame(initialState, expectedTurn, expectedShipsSunk, expectedNickname);
-
-        assertTrue(GameFileManager.isAGameSaved(), "The save files should exist on disk after saving.");
-
-        GameState loadedState = GameFileManager.loadGame();
-        int loadedTurn = GameFileManager.loadTurn();
-        int loadedShipsSunk = GameFileManager.loadNumberShipsSunkPlayerHuman();
-        String loadedNickname = GameFileManager.loadNicknamePlayerHuman();
-
-        assertNotNull(loadedState, "The restored GameState should not be null.");
-        assertEquals(expectedTurn, loadedTurn, "The restored turn number must match the saved value.");
-        assertEquals(expectedShipsSunk, loadedShipsSunk, "The restored sunk ships count must match the saved value.");
-        assertEquals(expectedNickname, loadedNickname, "The restored nickname must match the saved value.");
+        assertTrue(GameFileManager.hasValidSave());
+        assertFalse(restored.isPlayerTurn());
+        assertEquals("Verifier", restored.getUserType());
+        assertEquals("Captain Java", restored.getNickname());
+        assertEquals(Board.WATER, restored.getGame().getPlayerMachine().getBoard().getStateOfCell(waterTarget[0], waterTarget[1]));
+        assertEquals(game.getPlayerHuman().getBoard().getCells().size(), restored.getGame().getPlayerHuman().getBoard().getCells().size());
     }
 
+    /** Verifies a missing snapshot cannot be loaded. */
     @Test
-    @DisplayName("Should throw GameLoadException when trying to load data without save files")
-    void testLoadWithoutSaveFiles() {
-        assertAll("Ensure all load methods throw GameLoadException when save files are missing",
-                () -> assertThrows(GameLoadException.class, GameFileManager::loadGame,
-                        "Loading GameState without a save file should throw GameLoadException."),
-                () -> assertThrows(GameLoadException.class, GameFileManager::loadTurn,
-                        "Loading turn without a save file should throw GameLoadException."),
-                () -> assertThrows(GameLoadException.class, GameFileManager::loadNumberShipsSunkPlayerHuman,
-                        "Loading sunk ships count without a save file should throw GameLoadException."),
-                () -> assertThrows(GameLoadException.class, GameFileManager::loadNicknamePlayerHuman,
-                        "Loading nickname without a save file should throw GameLoadException.")
-        );
+    void rejectsLoadingWhenNoSnapshotExists() {
+        assertThrows(GameLoadException.class, GameFileManager::loadGame);
+        assertFalse(GameFileManager.hasValidSave());
     }
 
-    @Test
-    @DisplayName("Should successfully delete saved game files and update status")
-    void testDeleteGame() {
-        Board playerBoard = new Board(10);
-        Board machineBoard = new Board(10);
-        GameState dummyState = new GameState(playerBoard, machineBoard);
+    /** Builds a complete legal game used by persistence tests. */
+    private Game createActiveGame() throws Exception {
+        Game game = new Game();
+        game.startPlacement("Captain Java");
+        Ship frigate = game.getPlayerHuman().getShips().get(9);
+        game.getPlayerHuman().placeShipOnBoard(0, 0, frigate, true);
+        game.startMatch();
+        return game;
+    }
 
-        GameFileManager.saveGame(dummyState, 1, 0, "TestPlayer");
-        assertTrue(GameFileManager.isAGameSaved(), "Save files should exist prior to deletion.");
-
-        GameFileManager.deleteGame();
-
-        assertFalse(GameFileManager.isAGameSaved(), "The save files should no longer exist after calling deleteGame().");
+    /**
+     * Finds an empty target guaranteed to become a miss.
+     *
+     * @param board board to inspect
+     * @return row and column of a water target
+     */
+    private int[] findWaterTarget(Board board) {
+        for (int row = 0; row < 10; row++) {
+            for (int column = 0; column < 10; column++) {
+                if (board.getCells().get(row).get(column).getShip() == null) {
+                    return new int[]{row, column};
+                }
+            }
+        }
+        throw new IllegalStateException("The board has no water target.");
     }
 }

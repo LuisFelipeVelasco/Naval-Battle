@@ -2,6 +2,7 @@ package com.examplez.demo.model;
 
 import com.examplez.demo.model.exceptions.InvalidPositionException;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Random;
 
@@ -13,6 +14,10 @@ import java.util.Random;
  * not require manual interaction for ship placement.
  */
 public class PlayerMachine extends Player {
+
+    /** Serialization identifier for persisted machine players. */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new machine player with the given fleet of ships.

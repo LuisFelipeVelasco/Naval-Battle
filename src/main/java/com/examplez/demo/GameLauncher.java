@@ -12,11 +12,17 @@ import java.io.IOException;
  */
 
 public class GameLauncher extends Application {
+    /**
+     * Loads and displays the initial menu scene.
+     *
+     * @param stage primary JavaFX stage
+     * @throws IOException if the menu FXML cannot be loaded
+     */
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(GameLauncher.class.getResource("menu-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1100, 720);
-        stage.setTitle("menu");
+        stage.setTitle("Naval Battle");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.centerOnScreen();

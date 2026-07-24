@@ -1,6 +1,7 @@
 package com.examplez.demo.model;
 
 import java.io.Serializable;
+import java.io.Serial;
 
 /**
  * Representation of a cell in the board of a player
@@ -11,6 +12,10 @@ import java.io.Serializable;
  * @see java.io.Serializable
  */
 public class Cell implements Serializable {
+    /** Serialization identifier for persisted cells. */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /** the state that has the cell (no attacked  , attacked  or sunken )*/
     String state;
     /** ship on the cell */
@@ -63,9 +68,9 @@ public class Cell implements Serializable {
     }
 
     /**
-     * Returns the id's ship occupying this cell.
+     * Returns the identifier of the ship occupying this cell.
      *
-     * @return the id's ship, or {@code null} if the cell is empty
+     * @return the ship identifier, or {@code -1} if the cell is empty
      */
     public int getIdOfShip(){
         return (ship != null) ? ship.getId() : -1;
@@ -83,9 +88,9 @@ public class Cell implements Serializable {
     /**
      * Returns the size of the ship occupying this cell.
      *
-     * @return the sizes' type, or {@code null} if the cell is empty
+     * @return the ship size, or {@code null} if the cell is empty
      */
-    public int getSizeOfShip(){
+    public Integer getSizeOfShip(){
         return (ship != null) ? ship.getSize() : null;
     }
 }

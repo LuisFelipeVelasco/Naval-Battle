@@ -105,6 +105,17 @@
     -fx-padding: 2 20 6 20;
 }
 
+.nickname-label {
+    -fx-text-fill: #8eeaf9;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 12 3 12;
+    -fx-background-color: rgba(10, 35, 57, 0.56);
+    -fx-background-radius: 99;
+    -fx-border-color: rgba(104, 220, 241, 0.34);
+    -fx-border-radius: 99;
+}
+
 /* ---------- Actions ---------- */
 
 .button-row {

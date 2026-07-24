@@ -2,6 +2,8 @@ package com.examplez.demo.model;
 
 import com.examplez.demo.model.exceptions.InvalidPositionException;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +13,11 @@ import java.util.List;
  * the {@link #createBoard(int)} method to define how the board is initialized
  * and how ships are placed (manually by the user or automatically by the AI).
  */
-public abstract class Player {
+public abstract class Player implements Serializable {
+
+    /** Serialization identifier shared by persisted player implementations. */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * The list of ships belonging to this player.
@@ -73,13 +79,11 @@ public abstract class Player {
      */
     public void placeShipOnBoard(int row, int column, Ship shipSelected, boolean horizontal)
             throws InvalidPositionException {
-        for (Ship ship : ships) {
-            if (shipSelected == ship) {
-                ships.remove(shipSelected);
-                break;
-            }
+        if (shipSelected == null || !ships.contains(shipSelected)) {
+            throw new IllegalArgumentException("The selected ship does not belong to this fleet.");
         }
         board.placeShip(row, column, shipSelected, horizontal);
+        ships.remove(shipSelected);
     }
 
     /**

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" styleClass="battle-root" stylesheets="@battle-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.PlayController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" styleClass="battle-root" stylesheets="@battle-style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.PlayController">
 
     <top>
         <VBox alignment="CENTER" spacing="4.0" styleClass="combat-header" BorderPane.alignment="CENTER">
@@ -25,6 +25,8 @@
             </HBox>
 
             <Label styleClass="screen-title" text="BATTLESHIP" />
+
+            <Label fx:id="commanderLabel" styleClass="commander-context" text="COMMANDER: READY" />
 
             <HBox alignment="CENTER" spacing="8.0" styleClass="turn-status">
 

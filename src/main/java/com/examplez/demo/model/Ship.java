@@ -1,6 +1,7 @@
 package com.examplez.demo.model;
 
 import java.io.Serializable;
+import java.io.Serial;
 
 /**
  * Representation of a ship in the Battleship game.
@@ -15,6 +16,10 @@ import java.io.Serializable;
  * @see java.io.Serializable
  */
 public class Ship implements Serializable {
+
+    /** Serialization identifier for persisted ships. */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Unique identifier for this ship.

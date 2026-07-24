@@ -15,7 +15,7 @@
             prefHeight="720.0" prefWidth="1100.0"
             styleClass="placement-root, placement-space"
             stylesheets="@place-ships-style.css"
-            xmlns="http://javafx.com/javafx/25"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.examplez.demo.controller.PlacementController">
 
@@ -39,6 +39,7 @@
             <Label styleClass="screen-title" text="BATTLESHIP" />
             <Label styleClass="screen-subtitle"
                    text="Place your fleet before starting the match" />
+            <Label fx:id="commanderLabel" styleClass="commander-context" text="COMMANDER: READY // DEPLOY YOUR FLEET" />
         </VBox>
     </top>
 

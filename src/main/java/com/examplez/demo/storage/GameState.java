@@ -1,49 +1,156 @@
 package com.examplez.demo.storage;
 
-import com.examplez.demo.model.Board;
+import com.examplez.demo.model.Game;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
- * Data Transfer Object that represents the stage of the game's state in this turn.
- * Stores the human player's and machine's boards.
+ * Serializable snapshot containing every value required to resume an active match.
  *
- * @see java.io.Serializable
+ * <p>The complete {@link Game} model is stored so both boards, ships, attacked
+ * cells, sunk counters and the player's nickname are restored exactly as they
+ * were. The snapshot also records whose turn it is and the selected game mode.</p>
  */
-public class GameState implements Serializable {
+public final class GameState implements Serializable {
 
-    /** The human player's board state. */
-    private final Board playerBoard;
+    /** Serialization identifier used to detect incompatible save formats. */
+    @Serial
+    private static final long serialVersionUID = 2L;
 
-    /** The machine player's board state. */
-    private final Board playerMachineBoard;
+    /** Current save-format version. */
+    public static final int CURRENT_FORMAT_VERSION = 1;
+
+    /** Version of the format used to create this snapshot. */
+    private final int formatVersion;
+
+    /** Complete game model at the moment the snapshot was created. */
+    private final Game game;
+
+    /** Indicates whether the human player owns the next turn. */
+    private final boolean playerTurn;
+
+    /** Game mode selected when the match was created. */
+    private final String userType;
+
+    /** Player nickname copied for validation and menu presentation. */
+    private final String nickname;
+
+    /** UTC timestamp indicating when the snapshot was created. */
+    private final Instant savedAt;
 
     /**
-     * Constructs a new {@code GameState} containing some of the necessary data to restore a game session.
+     * Creates a complete snapshot of an active match.
      *
-     * @param playerBoard        the {@link Board} instance for the human player.
-     * @param playerMachineBoard the {@link Board} instance for the machine player.
+     * @param game       complete game model to persist
+     * @param playerTurn {@code true} when the human player owns the next turn
+     * @param userType   selected game mode
      */
-    public GameState(Board playerBoard, Board playerMachineBoard) {
-        this.playerBoard = playerBoard;
-        this.playerMachineBoard = playerMachineBoard;
+    public GameState(Game game, boolean playerTurn, String userType) {
+        this.game = Objects.requireNonNull(game, "The game model cannot be null.");
+        this.playerTurn = playerTurn;
+        this.userType = normalizeUserType(userType);
+        this.nickname = validateNickname(game);
+        this.savedAt = Instant.now();
+        this.formatVersion = CURRENT_FORMAT_VERSION;
     }
 
     /**
-     * Gets the human player's board.
+     * Returns the complete persisted game model.
      *
-     * @return the human player's {@link Board}.
+     * @return restored game model
      */
-    public Board getPlayerBoard() {
-        return playerBoard;
+    public Game getGame() {
+        return game;
     }
 
     /**
-     * Gets the machine player's board.
+     * Indicates whether the human player owns the next turn.
      *
-     * @return the machine player's {@link Board}.
+     * @return {@code true} for the human turn; {@code false} for the machine turn
      */
-    public Board getPlayerMachineBoard() {
-        return playerMachineBoard;
+    public boolean isPlayerTurn() {
+        return playerTurn;
+    }
+
+    /**
+     * Returns the selected game mode.
+     *
+     * @return normalized game mode
+     */
+    public String getUserType() {
+        return userType;
+    }
+
+    /**
+     * Returns the persisted player nickname.
+     *
+     * @return nonblank player nickname
+     */
+    public String getNickname() {
+        return nickname;
+    }
+
+    /**
+     * Returns the instant when this snapshot was created.
+     *
+     * @return UTC save timestamp
+     */
+    public Instant getSavedAt() {
+        return savedAt;
+    }
+
+    /**
+     * Returns the save-format version.
+     *
+     * @return format version number
+     */
+    public int getFormatVersion() {
+        return formatVersion;
+    }
+
+    /**
+     * Checks whether the snapshot contains a supported and internally valid match.
+     *
+     * @return {@code true} when the snapshot can be safely resumed
+     */
+    public boolean isValid() {
+        return formatVersion == CURRENT_FORMAT_VERSION
+                && game != null
+                && game.hasActiveMatch()
+                && nickname != null
+                && !nickname.isBlank()
+                && nickname.equals(game.getPlayerHuman().getPlayerName());
+    }
+
+    /**
+     * Reads and validates the nickname from the supplied game model.
+     *
+     * @param game game model containing the human player
+     * @return validated nickname
+     * @throws IllegalArgumentException if the game does not contain a nickname
+     */
+    private static String validateNickname(Game game) {
+        if (game.getPlayerHuman() == null) {
+            throw new IllegalArgumentException("The game does not contain a human player.");
+        }
+
+        String playerName = game.getPlayerHuman().getPlayerName();
+        if (playerName == null || playerName.isBlank()) {
+            throw new IllegalArgumentException("The player nickname cannot be blank.");
+        }
+        return playerName.trim();
+    }
+
+    /**
+     * Normalizes a potentially missing game mode.
+     *
+     * @param userType requested game mode
+     * @return normalized game mode
+     */
+    private static String normalizeUserType(String userType) {
+        return userType == null || userType.isBlank() ? "Player" : userType.trim();
     }
 }

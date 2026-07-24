@@ -68,6 +68,17 @@
     -fx-font-size: 14px;
 }
 
+.commander-context {
+    -fx-text-fill: #88eaf8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 10 2 10;
+    -fx-background-color: rgba(8, 33, 54, 0.60);
+    -fx-background-radius: 99;
+    -fx-border-color: rgba(103, 219, 239, 0.32);
+    -fx-border-radius: 99;
+}
+
 /* ==================== BOARD ==================== */
 
 .board-zone {

@@ -1,129 +1,75 @@
 package com.examplez.demo.controller;
+
+import com.examplez.demo.model.Board;
+import com.examplez.demo.model.Cell;
+import com.examplez.demo.model.Game;
+import com.examplez.demo.model.Ship;
 import com.examplez.demo.storage.GameFileManager;
 import com.examplez.demo.storage.GameState;
-
-import com.examplez.demo.model.*;
-import com.examplez.demo.model.exceptions.InvalidPositionException;
 import javafx.animation.PauseTransition;
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.input.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.collections.FXCollections;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-
-import java.io.IOException;
 
 /**
- * Controller for the play view (play-match-view.fxml), where the shooting
- * phase of the match takes place.
- * <p>
- * Manages two boards: the main board (the machine's territory, where
- * the human player shoots) and the position board (the human player's
- * own territory, shown in observation mode only).
+ * Controls the combat screen and preserves every active-match value after a save.
  */
 public class PlayController {
 
-    @FXML
-    Label turnLabel;
-
-    /**
-     * Map that stores ship type images for visual representation on the board.
-     */
+    /** Number of rows and columns in each tactical board. */
+    private static final int BOARD_SIZE = 10;
+    /** Side length of a visual board cell. */
+    private static final double CELL_SIZE = 50.0;
+    /** Images used to display the four ship types. */
     private static final Map<String, Image> SHIP_IMAGES = new HashMap<>();
 
     static {
-        SHIP_IMAGES.put("carrier",
-                new Image(PlayController.class.getResourceAsStream("/Images/carrier.png")));
-
-        SHIP_IMAGES.put("submarine",
-                new Image(PlayController.class.getResourceAsStream("/Images/submarine.png")));
-
-        SHIP_IMAGES.put("destructor",
-                new Image(PlayController.class.getResourceAsStream("/Images/destructor.png")));
-
-        SHIP_IMAGES.put("frigate",
-                new Image(PlayController.class.getResourceAsStream("/Images/frigate.png")));
+        SHIP_IMAGES.put("carrier", new Image(PlayController.class.getResourceAsStream("/Images/carrier.png")));
+        SHIP_IMAGES.put("submarine", new Image(PlayController.class.getResourceAsStream("/Images/submarine.png")));
+        SHIP_IMAGES.put("destructor", new Image(PlayController.class.getResourceAsStream("/Images/destructor.png")));
+        SHIP_IMAGES.put("frigate", new Image(PlayController.class.getResourceAsStream("/Images/frigate.png")));
     }
-    /**color of one cell.*/
-    private static final Color CELL_A =
-            Color.web("#315B79", 0.72);
-    /**color of one cell.*/
-    private static final Color CELL_B =
-            Color.web("#3A6782", 0.68);
-    /**border of one cell.*/
-    private static final Color CELL_STROKE =
-            Color.web("#78C8DE", 0.60);
 
-    /**
-     * The size of each cell in pixels.
-     */
-    private static final double CELL_SIZE = 35;
-
-    /**
-     * The gap between cells in pixels.
-     */
-    private static final double GAP = 2;
-
-    /**
-     * Flag indicating whether it is the human player's turn.
-     */
-    private boolean playerTurn = true;
-
-    /**
-     * Grid pane that displays the machine's board (the main board where the player shoots).
-     */
-    @FXML
-    private GridPane mainBoardGrid;
-
-    /**
-     * Grid pane that displays the human player's own board (for observation).
-     */
-    @FXML
-    private GridPane positionBoardGrid;
-
-    /**
-     * Matrix of StackPane cells for the main board.
-     */
-    private StackPane[][] mainCells = new StackPane[10][10];
-
-    /**
-     * Matrix of StackPane cells for the position board.
-     */
-    private StackPane[][] positionCells = new StackPane[10][10];
-
-    /**
-     * The game model instance.
-     */
+    /** Label that describes whose turn is active. */
+    @FXML private Label turnLabel;
+    /** Label that identifies the active commander. */
+    @FXML private Label commanderLabel;
+    /** Grid that represents the enemy board. */
+    @FXML private GridPane mainBoardGrid;
+    /** Grid that represents the human player's board. */
+    @FXML private GridPane positionBoardGrid;
+    /** Visual cells for enemy attacks. */
+    private final StackPane[][] mainCells = new StackPane[BOARD_SIZE][BOARD_SIZE];
+    /** Visual cells for the player's fleet. */
+    private final StackPane[][] positionCells = new StackPane[BOARD_SIZE][BOARD_SIZE];
+    /** Complete model for the current active match. */
     private Game gameModel;
+    /** Visibility mode selected for the match. */
+    private String typeOfUser = "Player";
+    /** Whether the human player owns the next turn. */
+    private boolean playerTurn = true;
+    /** Prevents a close event from saving a finished match. */
+    private boolean matchFinished;
 
-    /**Type of user selected by the user*/
-    private String typeOfUser;
-
-
-    /**
-     * JavaFX lifecycle method, called automatically right after the FXML
-     * is loaded. Builds the empty visual cells for both boards.
-     */
+    /** Creates the two visual tactical boards after FXML injection. */
     @FXML
     public void initialize() {
         createCells(mainBoardGrid, mainCells, true);
@@ -131,420 +77,332 @@ public class PlayController {
     }
 
     /**
-     * Injects the shared game model into this controller. Must be called
-     * before {@link #loadBoard()} so that both boards can be drawn from
-     * the actual placement made during the previous phase.
+     * Starts a newly created match after fleet placement.
      *
-     * @param gameModel the game model, with both fleets already placed
+     * @param game complete game model with both fleets placed
+     * @param userType selected visibility mode
      */
-    public void setGameModel(Game gameModel) {
-        this.gameModel = gameModel;
-    }
-
-    public void setTypeOfUser(String typeOfUser) {
-        this.typeOfUser = typeOfUser;
+    public void startSession(Game game, String userType) {
+        this.gameModel = game;
+        this.typeOfUser = normalizeUserType(userType);
+        this.playerTurn = true;
+        this.matchFinished = false;
+        refreshScreen();
+        autoSaveGame();
+        installCloseSaveHandler();
     }
 
     /**
-     * Creates the 100 visual cells of a board as {@link StackPane} nodes
-     * and adds them to the given grid.
+     * Restores an exact, serialized active session without rebuilding boards or ships.
      *
-     * @param grid       the grid pane to fill with cells
-     * @param cells      the matrix where the created cells are stored for later access
-     * @param allowClick {@code true} to enable click handling on this board; {@code false} otherwise
+     * @param state validated complete saved session
      */
-    private void createCells(GridPane grid, StackPane[][] cells, boolean allowClick) {
-        for (int row = 0; row < 10; row++) {
-            for (int column = 0; column < 10; column++) {
-                StackPane VisualCell = new StackPane();
-                Rectangle background = new Rectangle(50, 50);
-                styleNormalCell(background,row,column);
-                VisualCell.getChildren().add(background);
+    public void restoreSession(GameState state) {
+        this.gameModel = state.getGame();
+        this.typeOfUser = normalizeUserType(state.getUserType());
+        this.playerTurn = state.isPlayerTurn();
+        this.matchFinished = false;
+        refreshScreen();
+        installCloseSaveHandler();
+        if (!playerTurn) {
+            Platform.runLater(this::machineTurnLoop);
+        }
+    }
 
-                if (allowClick) {
-                    final int f = row, c = column;
-                    VisualCell.setOnMouseClicked(event -> onCellClicked(f, c));
+    /**
+     * Creates all empty cell containers for one board.
+     *
+     * @param grid target grid pane
+     * @param cells target visual-cell matrix
+     * @param clickable whether clicking a cell should fire at the enemy
+     */
+    private void createCells(GridPane grid, StackPane[][] cells, boolean clickable) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int column = 0; column < BOARD_SIZE; column++) {
+                StackPane cell = new StackPane();
+                Rectangle background = new Rectangle(CELL_SIZE, CELL_SIZE);
+                styleNormalCell(background, row, column);
+                cell.getChildren().add(background);
+                if (clickable) {
+                    final int targetRow = row;
+                    final int targetColumn = column;
+                    cell.setOnMouseClicked(event -> onCellClicked(targetRow, targetColumn));
                 }
-
-                cells[row][column] = VisualCell;
-                grid.add(VisualCell, column, row);
+                cells[row][column] = cell;
+                grid.add(cell, column, row);
             }
         }
     }
 
     /**
-     * Set a style to a rectangle that represent a cell
-     * @param cell rectangle passed
-     * @param row row of the rectangle
-     * @param column column of the rectangle
+     * Restores the base colour of one board rectangle.
+     *
+     * @param rectangle target rectangle
+     * @param row row index
+     * @param column column index
      */
-
-    private void styleNormalCell(Rectangle cell, int row, int column) {
-        cell.setFill(((row + column) & 1) == 0 ? CELL_A : CELL_B);
-        cell.setStroke(CELL_STROKE);
-        cell.setStrokeWidth(0.9);
-        cell.setArcWidth(6);
-        cell.setArcHeight(6);
-        cell.setEffect(null);
-        cell.setScaleX(1.0);
-        cell.setScaleY(1.0);
+    private void styleNormalCell(Rectangle rectangle, int row, int column) {
+        rectangle.setFill(Color.web(((row + column) % 2 == 0) ? "#356d8b" : "#2e617e", 0.88));
+        rectangle.setStroke(Color.web("#8fd9eb", 0.70));
+        rectangle.setStrokeWidth(0.9);
+        rectangle.setArcWidth(6);
+        rectangle.setArcHeight(6);
     }
 
     /**
-     * Builds the 2D figure used to represent a ship on the board.
+     * Processes a valid player attack on the enemy board.
      *
-     * @param ship       the ship to build a figure for
-     * @param horizontal {@code true} to build a horizontal figure, {@code false} for vertical
-     * @return a node representing the ship, ready to be added to the board grid
-     */
-    private Node createShipShape(Ship ship, boolean horizontal) {
-        Image image = SHIP_IMAGES.get(ship.getType());
-
-        ImageView imageView = new ImageView(image);
-        imageView.setPreserveRatio(false);
-        imageView.setSmooth(true);
-
-        imageView.setMouseTransparent(true);
-
-        Node shipNode = imageView;
-
-        if (!horizontal) {
-            imageView.setRotate(90);
-            shipNode = new Group(imageView);
-        }
-
-        StackPane container = new StackPane(shipNode);
-
-        container.setMouseTransparent(true);
-        return container;
-    }
-
-    /**
-     * Handles a click on the main board (machine's territory). Processes
-     * the attack, redraws the board, checks for victory, and either lets
-     * the player shoot again (on hit/sunk) or passes the turn to the machine.
-     *
-     * @param row    the row index clicked
-     * @param column the column index clicked
+     * @param row selected row
+     * @param column selected column
      */
     private void onCellClicked(int row, int column) {
-        if (!playerTurn) return;
-
-        Board machineBoard = gameModel.getPlayerMachine().getBoard();
-        if (machineBoard.isCellAlreadyAttacked(row, column)) return;
-        machineBoard.attackCell(row, column);
-
-        String result = machineBoard.getStateOfCell(row, column);
-        if (result.equals(Board.HIT) && machineBoard.isShipSunken(row, column)) {
-            machineBoard.sinkShip(row, column);
-            result = Board.SUNKEN;
-        }
-        drawMainBoard();
-
-        if (!machineBoard.isBoardWithShips()) {
-            changeFinalView("YOU WIN!","COMMAND CHANNEL SECURE");
+        if (matchFinished || !playerTurn || gameModel == null) {
             return;
         }
-
-        // Auto save progress after human move
-        autoSaveGame();
-
-        if (result.equals(Board.WATER)) {
+        Board enemyBoard = gameModel.getPlayerMachine().getBoard();
+        if (enemyBoard.isCellAlreadyAttacked(row, column)) {
+            return;
+        }
+        enemyBoard.attackCell(row, column);
+        if (enemyBoard.getStateOfCell(row, column).equals(Board.HIT) && enemyBoard.isShipSunken(row, column)) {
+            enemyBoard.sinkShip(row, column);
+        }
+        if (!enemyBoard.isBoardWithShips()) {
+            finishMatch(gameModel.getPlayerHuman().getPlayerName().toUpperCase() + " WINS", "MISSION COMPLETE // ENEMY FLEET DESTROYED");
+            return;
+        }
+        if (enemyBoard.getStateOfCell(row, column).equals(Board.WATER)) {
             playerTurn = false;
-            turnLabel.setText("TURN: MACHINE");
+            updateTurnLabel();
+        }
+        refreshScreen();
+        autoSaveGame();
+        if (!playerTurn) {
             machineTurnLoop();
         }
-        // if HIT or SUNKEN, the player keeps shooting (nothing else to do)
     }
 
-
-    /**
-     * Draws the initial state of both boards from the game model. Must
-     * be called once, right after {@link #setGameModel(Game)}, so the UI
-     * reflects whatever state already exists in the model (e.g. a
-     * freshly started match with both fleets placed).
-     */
-    public void loadBoard() {
-        drawMainBoard();
-        drawPositionBoard();
-        drawPlayerShips();
-        if(typeOfUser.equals("Verificator")) drawMachineShips();
-    }
-
-    /**
-     * Paints the main board (the machine's territory) based on the
-     * current state of the machine player's board: only the results of
-     * shots already taken (water, hit, sunk) are reflected; ships that
-     * have not been hit remain hidden.
-     */
-    private void drawMainBoard() {
-        List<List<Cell>> board = gameModel.getPlayerMachine().getBoard().getCells();
-        for (int row = 0; row < 10; row++) {
-            for (int column = 0; column < 10; column++) {
-                String state = board.get(row).get(column).getState();
-                Rectangle background = (Rectangle) mainCells[row][column].getChildren().get(0);
-
-                switch (state) {
-                    case Board.WATER -> background.setFill(Color.web("#181e30"));      // watermark (X) would be added separately
-                    case Board.HIT -> drawHitMarker(row,column,mainBoardGrid);
-                    case Board.SUNKEN -> drawSunkenMarker(row,column,mainBoardGrid);
-                }
-            }
-        }
-    }
-
-    /**
-     * Paints the position board (the human player's own territory)
-     * based on the current state of the human player's board: own ships
-     * are shown, along with any shots the machine has already made
-     * against them.
-     */
-    private void drawPositionBoard() {
-        List<List<Cell>> board = gameModel.getPlayerHuman().getBoard().getCells();
-
-        for (int row = 0; row < 10; row++) {
-            for (int column = 0; column < 10; column++) {
-                String state = board.get(row).get(column).getState();
-                Rectangle background = (Rectangle) positionCells[row][column].getChildren().get(0);
-
-                switch (state) {
-                    case Board.WATER -> background.setFill(Color.web("#181E30"));
-                    case Board.HIT -> drawHitMarker(row, column,positionBoardGrid);
-                    case Board.SUNKEN -> drawSunkenMarker(row, column,positionBoardGrid);
-                }
-            }
-        }
-    }
-
-    /**
-     * Draws the human player's own ships on the position board.
-     * Only the starting cell of each ship is used to place the entire figure.
-     */
-    private void drawPlayerShips() {
-        List<List<Cell>> board = gameModel.getPlayerHuman().getBoard().getCells();
-
-        for (int row = 0; row < 10; row++) {
-            for (int column = 0; column < 10; column++) {
-                Cell cell = board.get(row).get(column);
-                if (cell.getShip() == null) {
-                    continue;
-                }
-
-                Ship ship = cell.getShip();
-
-                // Is this the start of the ship?
-                boolean sameUp = row > 0 && board.get(row - 1).get(column).getShip() == ship;
-                boolean sameLeft = column > 0 && board.get(row).get(column - 1).getShip() == ship;
-
-                if (sameUp || sameLeft) {
-                    continue;
-                }
-
-                // Detect orientation
-                boolean horizontal = column + 1 < 10 && board.get(row).get(column + 1).getShip() == ship;
-
-                Node figure = createShipShape(ship, horizontal);
-
-                GridPane.setRowIndex(figure, row);
-                GridPane.setColumnIndex(figure, column);
-
-                GridPane.setColumnSpan(figure, horizontal ? ship.getSize() : 1);
-                GridPane.setRowSpan(figure, horizontal ? 1 : ship.getSize());
-
-                positionBoardGrid.getChildren().add(figure);
-            }
-        }
-    }
-
-    /**
-     * Draws the  machine player's own ships on the position board.
-     * Only the starting cell of each ship is used to place the entire figure.
-     */
-    private void drawMachineShips() {
-        List<List<Cell>> board = gameModel.getPlayerMachine().getBoard().getCells();
-
-        for (int row = 0; row < 10; row++) {
-            for (int column = 0; column < 10; column++) {
-                Cell cell = board.get(row).get(column);
-                if (cell.getShip() == null) {
-                    continue;
-                }
-
-                Ship ship = cell.getShip();
-
-                // Is this the start of the ship?
-                boolean sameUp = row > 0 && board.get(row - 1).get(column).getShip() == ship;
-                boolean sameLeft = column > 0 && board.get(row).get(column - 1).getShip() == ship;
-
-                if (sameUp || sameLeft) {
-                    continue;
-                }
-
-                // Detect orientation
-                boolean horizontal = column + 1 < 10 && board.get(row).get(column + 1).getShip() == ship;
-
-                Node figure = createShipShape(ship, horizontal);
-
-                GridPane.setRowIndex(figure, row);
-                GridPane.setColumnIndex(figure, column);
-
-                GridPane.setColumnSpan(figure, horizontal ? ship.getSize() : 1);
-                GridPane.setRowSpan(figure, horizontal ? 1 : ship.getSize());
-
-                mainBoardGrid.getChildren().add(figure);
-            }
-        }
-    }
-
-
-    /**
-     * Draws a hit marker (✕) on the given cell of the position board.
-     *
-     * @param row    the row index
-     * @param column the column index
-     */
-    private void drawHitMarker(int row, int column, GridPane board) {
-        removeMarker(board, row, column);
-
-        Label mark = new Label("✕");
-        mark.setId("boardMark");
-        mark.setMouseTransparent(true);
-
-        mark.setStyle("""
-        -fx-font-size: 30px;
-        -fx-font-weight: bold;
-        -fx-text-fill: orange;
-        """);
-
-        board.add(mark, column, row);
-        mark.toFront();
-    }
-
-    /**
-     * Draws a sunk marker (☠) on the given cell of the position board.
-     *
-     * @param row    the row index
-     * @param column the column index
-     */
-    private void drawSunkenMarker(int row, int column, GridPane board) {
-        removeMarker(board, row, column);
-
-        Label mark = new Label("☠");
-        mark.setId("boardMark");
-        mark.setMouseTransparent(true);
-
-        mark.setStyle("""
-        -fx-font-size: 30px;
-        -fx-text-fill: #ff657b;
-        -fx-font-weight: bold;
-        """);
-
-        board.add(mark, column, row);
-        mark.toFront();
-    }
-
-    /**
-     * Executes the machine's turn loop. The machine attacks, the board is updated,
-     * and if the attack is a hit or a sunk, the machine continues; otherwise the
-     * turn passes back to the player.
-     */
+    /** Runs one delayed machine attack and continues while the machine hits a ship. */
     private void machineTurnLoop() {
-        PauseTransition pause = new PauseTransition(Duration.millis(1000));
-        pause.setOnFinished(event -> {
-            turnLabel.setText("TURN: MACHINE");
-            gameModel.processMachineAttack(); // still void, unchanged
-            drawPositionBoard();
-
-            Board humanBoard = gameModel.getPlayerHuman().getBoard();
-
-            if (!humanBoard.isBoardWithShips()) {
-                changeFinalView("MACHINE WINS!" , "COMMAND CHANNEL LOST");
+        if (matchFinished || playerTurn || gameModel == null) {
+            return;
+        }
+        PauseTransition delay = new PauseTransition(Duration.millis(700));
+        delay.setOnFinished(event -> {
+            if (matchFinished || playerTurn) {
                 return;
             }
-
-            // Auto save progress after machine move
+            gameModel.processMachineAttack();
+            Board playerBoard = gameModel.getPlayerHuman().getBoard();
+            if (!playerBoard.isBoardWithShips()) {
+                finishMatch("MACHINE WINS", "MISSION FAILED // YOUR FLEET WAS DESTROYED");
+                return;
+            }
+            if (playerBoard.getStateLastCellAttacked().equals(Board.WATER)) {
+                playerTurn = true;
+            }
+            updateTurnLabel();
+            refreshScreen();
             autoSaveGame();
-
-            String lastResult = humanBoard.getStateLastCellAttacked();
-            if (lastResult.equals(Board.WATER)) {
-                playerTurn = true; // turn returns to the player
-                turnLabel.setText("TURN: PLAYER");
-            } else {
-                machineTurnLoop(); // machine keeps shooting (HIT or SUNKEN)
+            if (!playerTurn) {
+                machineTurnLoop();
             }
         });
-        pause.play();
+        delay.play();
+    }
+
+    /** Refreshes labels, ships and all recorded attack markers from the model. */
+    private void refreshScreen() {
+        if (gameModel == null) {
+            return;
+        }
+        clearDynamicNodes(mainBoardGrid);
+        clearDynamicNodes(positionBoardGrid);
+        drawShips(gameModel.getPlayerHuman().getBoard(), positionBoardGrid);
+        if ("Verifier".equalsIgnoreCase(typeOfUser)) {
+            drawShips(gameModel.getPlayerMachine().getBoard(), mainBoardGrid);
+        }
+        drawBoardStates(gameModel.getPlayerMachine().getBoard(), mainBoardGrid, mainCells);
+        drawBoardStates(gameModel.getPlayerHuman().getBoard(), positionBoardGrid, positionCells);
+        commanderLabel.setText("COMMANDER: " + gameModel.getPlayerHuman().getPlayerName().toUpperCase());
+        updateTurnLabel();
     }
 
     /**
-     * Switches the scene to the final view, passing the winner message.
+     * Removes only ship and marker nodes while retaining the 100 cell containers.
      *
-     * @param winner the winner message to display
+     * @param grid board that will be redrawn
      */
-    private void changeFinalView(String winner , String status) {
-        // Delete persistent save files when the game ends
+    private void clearDynamicNodes(GridPane grid) {
+        grid.getChildren().removeIf(node -> "ship-overlay".equals(node.getUserData()) || "board-marker".equals(node.getUserData()));
+    }
+
+    /**
+     * Draws every unique ship on its correct starting board cell.
+     *
+     * @param board model board containing ships
+     * @param grid visual grid receiving the ship figures
+     */
+    private void drawShips(Board board, GridPane grid) {
+        List<List<Cell>> cells = board.getCells();
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int column = 0; column < BOARD_SIZE; column++) {
+                Ship ship = cells.get(row).get(column).getShip();
+                if (ship == null || hasSameShipBefore(cells, row, column, ship)) {
+                    continue;
+                }
+                boolean horizontal = column + 1 < BOARD_SIZE && cells.get(row).get(column + 1).getShip() == ship;
+                Node figure = createShipShape(ship, horizontal);
+                figure.setUserData("ship-overlay");
+                GridPane.setRowIndex(figure, row);
+                GridPane.setColumnIndex(figure, column);
+                GridPane.setRowSpan(figure, horizontal ? 1 : ship.getSize());
+                GridPane.setColumnSpan(figure, horizontal ? ship.getSize() : 1);
+                grid.getChildren().add(figure);
+            }
+        }
+    }
+
+    /**
+     * Determines whether another segment of the same ship precedes this cell.
+     *
+     * @param cells complete board cell matrix
+     * @param row current row
+     * @param column current column
+     * @param ship candidate ship
+     * @return true when this is not the first occupied cell of the ship
+     */
+    private boolean hasSameShipBefore(List<List<Cell>> cells, int row, int column, Ship ship) {
+        return (row > 0 && cells.get(row - 1).get(column).getShip() == ship)
+                || (column > 0 && cells.get(row).get(column - 1).getShip() == ship);
+    }
+
+    /**
+     * Creates a transparent image overlay for a ship.
+     *
+     * @param ship ship to render
+     * @param horizontal orientation of the ship
+     * @return non-interactive ship overlay
+     */
+    private Node createShipShape(Ship ship, boolean horizontal) {
+        ImageView imageView = new ImageView(SHIP_IMAGES.get(ship.getType()));
+        imageView.setPreserveRatio(false);
+        imageView.setMouseTransparent(true);
+        if (horizontal) {
+            imageView.setFitWidth(CELL_SIZE * ship.getSize());
+            imageView.setFitHeight(CELL_SIZE);
+            return new StackPane(imageView);
+        }
+        imageView.setFitWidth(CELL_SIZE * ship.getSize());
+        imageView.setFitHeight(CELL_SIZE);
+        imageView.setRotate(90);
+        Group group = new Group(imageView);
+        group.setMouseTransparent(true);
+        return new StackPane(group);
+    }
+
+    /**
+     * Draws non-secret state colours and attack markers for a board.
+     *
+     * @param board model board
+     * @param grid visual grid
+     * @param visualCells visual cell matrix
+     */
+    private void drawBoardStates(Board board, GridPane grid, StackPane[][] visualCells) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int column = 0; column < BOARD_SIZE; column++) {
+                Rectangle rectangle = (Rectangle) visualCells[row][column].getChildren().get(0);
+                styleNormalCell(rectangle, row, column);
+                String state = board.getStateOfCell(row, column);
+                if (Board.WATER.equals(state)) {
+                    rectangle.setFill(Color.web("#070b13"));
+                    rectangle.setStroke(Color.web("#50616e"));
+                    addMarker(grid, row, column, "·", "#8aa1ae");
+                } else if (Board.HIT.equals(state)) {
+                    rectangle.setFill(Color.web("#71394a"));
+                    rectangle.setStroke(Color.web("#ff9ca9"));
+                    addMarker(grid, row, column, "✕", "#ffd0d5");
+                } else if (Board.SUNKEN.equals(state)) {
+                    rectangle.setFill(Color.web("#340b18"));
+                    rectangle.setStroke(Color.web("#ff657b"));
+                    addMarker(grid, row, column, "☠", "#ffb0bc");
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds an always-front, mouse-transparent attack marker.
+     *
+     * @param grid target grid
+     * @param row marker row
+     * @param column marker column
+     * @param text marker symbol
+     * @param colour marker colour
+     */
+    private void addMarker(GridPane grid, int row, int column, String text, String colour) {
+        Label marker = new Label(text);
+        marker.setMouseTransparent(true);
+        marker.setUserData("board-marker");
+        marker.setStyle("-fx-font-size: 27px; -fx-font-weight: bold; -fx-text-fill: " + colour + ";");
+        grid.add(marker, column, row);
+        marker.toFront();
+    }
+
+    /** Updates the visible turn instruction. */
+    private void updateTurnLabel() {
+        turnLabel.setText(playerTurn ? "YOUR TURN // SELECT A TARGET" : "MACHINE TURN // HOLD POSITION");
+    }
+
+    /** Installs the close handler after the controller has a scene and stage. */
+    private void installCloseSaveHandler() {
+        Platform.runLater(() -> {
+            if (mainBoardGrid.getScene() != null && mainBoardGrid.getScene().getWindow() != null) {
+                mainBoardGrid.getScene().getWindow().setOnCloseRequest(event -> autoSaveGame());
+            }
+        });
+    }
+
+    /** Saves the complete active session whenever its state changes or the window closes. */
+    private void autoSaveGame() {
+        if (!matchFinished && gameModel != null && gameModel.hasActiveMatch()) {
+            GameFileManager.saveGame(new GameState(gameModel, playerTurn, typeOfUser));
+        }
+    }
+
+    /**
+     * Deletes the active save and opens the final screen after a completed match.
+     *
+     * @param winner visible winner message
+     * @param status visible debrief status
+     */
+    private void finishMatch(String winner, String status) {
+        matchFinished = true;
         GameFileManager.deleteGame();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/examplez/demo/FinalView.fxml"));
             Parent root = loader.load();
-
             FinalController controller = loader.getController();
             controller.setWinner(winner);
             controller.setStatus(status);
-
+            controller.setNickname(gameModel.getPlayerHuman().getPlayerName());
             Stage stage = (Stage) mainBoardGrid.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.setOnCloseRequest(null);
+            stage.setScene(new Scene(root, 1100, 700));
             stage.centerOnScreen();
-            stage.setResizable(false);
             stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            throw new IllegalStateException("The final screen could not be opened.", exception);
         }
     }
 
-    private void removeMarker(GridPane board, int row, int column) {
-        board.getChildren().removeIf(node -> {
-            Integer nodeRow = GridPane.getRowIndex(node);
-            Integer nodeColumn = GridPane.getColumnIndex(node);
-
-            int currentRow = nodeRow == null ? 0 : nodeRow;
-            int currentColumn = nodeColumn == null ? 0 : nodeColumn;
-
-            return node instanceof Label label
-                    && "boardMark".equals(label.getId())
-                    && currentRow == row
-                    && currentColumn == column;
-        });
-    }
-
     /**
-     * Helper method that captures current match data and auto-saves it to disk.
+     * Normalizes an optional game mode.
+     *
+     * @param userType requested mode
+     * @return nonblank mode value
      */
-    private void autoSaveGame() {
-        if (gameModel == null) return;
-
-        try {
-            Board humanBoard = gameModel.getPlayerHuman().getBoard();
-            Board machineBoard = gameModel.getPlayerMachine().getBoard();
-
-            // Current state of the Boards
-            GameState currentState = new GameState(humanBoard, machineBoard);
-
-            int currentTurn = playerTurn ? 1 : 0; // 1 = Human turn, 0 = Machine turn
-            int shipsSunkByHuman = machineBoard.getNumberShipsSunk(); // Ships sunk on machine's board
-
-            //String nickname = gameModel.getPlayerHuman().setPlayerName("kjajdf ");
-            GameFileManager.saveGame(currentState, currentTurn, shipsSunkByHuman, "hola");
-        } catch (Exception e) {
-            System.err.println("Error automatic saving game: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Load the turn where a game was saved.
-     * */
-    public void restoreLoadedTurn(int turnLoad){
-        playerTurn = turnLoad == 1;
+    private String normalizeUserType(String userType) {
+        return userType == null || userType.isBlank() ? "Player" : userType;
     }
 }

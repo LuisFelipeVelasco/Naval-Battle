@@ -3,186 +3,202 @@ package com.examplez.demo.storage;
 import com.examplez.demo.storage.exceptions.GameLoadException;
 import com.examplez.demo.storage.exceptions.GameSaveException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 /**
- * Utility class responsible for managing persistent game storage operations.
+ * Facade responsible for persistent match storage.
  *
- * <p><b>Design Pattern - Facade:</b> This class acts as a Facade that provides
- * a simplified, unified interface to handle persistent storage. It hides the complexity of
- * managing two separate I/O subsystems:
- * <ul>
- *   <li><b>Binary Serialization Subsystem:</b> Handles complex state persistence using
- *       {@link ObjectOutputStream} and {@link ObjectInputStream} for {@link GameState}.</li>
- *   <li><b>Flat Text File Subsystem:</b> Handles lightweight game metrics (turn, sunk ships,
- *       player nickname) using {@link BufferedWriter} and {@link BufferedReader} formatted as CSV.</li>
- * </ul>
- * Controllers (clients) interact exclusively with this Facade, remaining entirely decoupled
- * from the underlying file structures, parsing rules, and I/O exception handling.</p>
- *
- * <p>This class cannot be instantiated.</p>
+ * <p>A single binary snapshot is written through a temporary file and then
+ * moved into place. This prevents the model, nickname and turn information
+ * from becoming desynchronized if the application closes during a write.</p>
  */
-public class GameFileManager {
+public final class GameFileManager {
 
-    /** Path to the file storing the serialized {@link GameState} object. */
-    private static final String SERIALIZED_FILE = "lastGamingSession.ser";
+    /** System property that optionally overrides the save directory. */
+    public static final String SAVE_DIRECTORY_PROPERTY = "navalbattle.save.directory";
 
-    /** Path to the text file storing game statistics (turn, ships sunk, nickname). */
-    private static final String STATISTICS_FILE = "lastStatisticsGame.txt";
+    /** Default directory name created inside the current user's home folder. */
+    private static final String DEFAULT_DIRECTORY_NAME = ".naval-battle";
+
+    /** Name of the active-session file. */
+    private static final String SAVE_FILE_NAME = "active-session.sav";
+
+    /** Name of the temporary file used during atomic writes. */
+    private static final String TEMP_FILE_NAME = "active-session.tmp";
+
+    /** Name of the legacy serialized file removed during cleanup. */
+    private static final String LEGACY_SERIALIZED_FILE = "lastGamingSession.ser";
+
+    /** Name of the legacy text file removed during cleanup. */
+    private static final String LEGACY_STATISTICS_FILE = "lastStatisticsGame.txt";
 
     /**
-     * Private constructor to prevent instantiation of this utility class.
-     *
-     * @throws UnsupportedOperationException if instantiation is attempted.
+     * Prevents construction of this utility class.
      */
     private GameFileManager() {
-        throw new UnsupportedOperationException("GameFileManager is a utility class and cannot be instantiated.");
+        throw new UnsupportedOperationException("GameFileManager cannot be instantiated.");
     }
 
     /**
-     * Saves the current state of the game, the active turn,ships sunk count,
-     * and human player's nickname to persistent storage.
+     * Saves a complete game snapshot.
      *
-     * @param state                the {@link GameState} to be serialized.
-     * @param currentTurn          the integer representing the active turn number.
-     * @param shipsSunkPlayerHuman the number of ships sunk by the human player.
-     * @param nicknamePlayerHuman  the nickname of the human player.
-     * @throws GameSaveException   if an I/O error occurs while writing to disk.
+     * @param state valid snapshot to persist
+     * @throws GameSaveException if the target directory or file cannot be written
      */
-    public static void saveGame(GameState state, int currentTurn, int shipsSunkPlayerHuman, String nicknamePlayerHuman) {
-
-        // Save the state of Game into a serializable file
-        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(SERIALIZED_FILE))) {
-            output.writeObject(state);
-        } catch (IOException e) {
-            throw new GameSaveException("Error writing game state to file.", e);
+    public static synchronized void saveGame(GameState state) {
+        Objects.requireNonNull(state, "The game state cannot be null.");
+        if (!state.isValid()) {
+            throw new GameSaveException("The game state is incomplete and cannot be saved.", null);
         }
 
-        // Save current statistics formatted as CSV (turn,shipsSunk,nickname)
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STATISTICS_FILE, false))) {
-            String dataLine = String.format("%d,%d,%s", currentTurn, shipsSunkPlayerHuman, nicknamePlayerHuman);
-            writer.write(dataLine);
-            writer.newLine();
-        } catch (IOException e) {
-            throw new GameSaveException("Error writing game statistics to file.", e);
-        }
-    }
+        Path directory = getSaveDirectory();
+        Path temporaryFile = directory.resolve(TEMP_FILE_NAME);
+        Path saveFile = directory.resolve(SAVE_FILE_NAME);
 
-    /**
-     * Loads and restores the last saved {@link GameState} object from disk.
-     *
-     * @return the deserialized {@link GameState} instance.
-     * @throws GameLoadException if no saved game exists, if the class structure is incompatible,
-     *                           or if an I/O error occurs during reading.
-     */
-    public static GameState loadGame() {
-        if (!isAGameSaved()) {
-            throw new GameLoadException("No previous saved game found.", null);
-        }
-
-        try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(SERIALIZED_FILE))) {
-            return (GameState) input.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new GameLoadException("Save file is incompatible or class was not found.", e);
-        } catch (IOException e) {
-            throw new GameLoadException("Could not read the saved game file.", e);
-        }
-    }
-
-    /**
-     * Reads and returns the turn number from the last saved gaming session.
-     *
-     * @return the saved turn number as an integer.
-     * @throws GameLoadException if no saved record exists, or if the turn data cannot be read or parsed.
-     */
-    public static int loadTurn() {
-        String[] data = readStatisticsData();
         try {
-            return Integer.parseInt(data[0].trim());
-        } catch (NumberFormatException e) {
-            throw new GameLoadException("Unable to parse the saved turn number.", e);
+            Files.createDirectories(directory);
+            try (ObjectOutputStream output =
+                         new ObjectOutputStream(Files.newOutputStream(temporaryFile))) {
+                output.writeObject(state);
+                output.flush();
+            }
+            replaceSaveFile(temporaryFile, saveFile);
+        } catch (IOException exception) {
+            deleteQuietly(temporaryFile);
+            throw new GameSaveException("The active match could not be saved.", exception);
         }
     }
 
     /**
-     * Reads and returns the human player's nickname from the saved statistics file.
+     * Loads and validates the active game snapshot.
      *
-     * @return the saved player nickname as a {@String}.
-     * @throws GameLoadException if no saved record exists or if data is corrupt.
+     * @return valid persisted snapshot
+     * @throws GameLoadException if no save exists or the file is invalid
      */
-    public static String loadNicknamePlayerHuman() {
-        String[] data = readStatisticsData();
-        return data[2].trim();
+    public static synchronized GameState loadGame() {
+        Path saveFile = getSaveFile();
+        if (!Files.isRegularFile(saveFile)) {
+            throw new GameLoadException("No saved match was found.", null);
+        }
+
+        try (ObjectInputStream input =
+                     new ObjectInputStream(Files.newInputStream(saveFile))) {
+            Object value = input.readObject();
+            if (!(value instanceof GameState state) || !state.isValid()) {
+                throw new GameLoadException("The saved match is invalid or incompatible.", null);
+            }
+            return state;
+        } catch (GameLoadException exception) {
+            throw exception;
+        } catch (IOException | ClassNotFoundException | RuntimeException exception) {
+            throw new GameLoadException("The saved match could not be loaded.", exception);
+        }
     }
 
     /**
-     * Reads and returns the number of ships sunk by the human player from the saved statistics file.
+     * Checks whether a complete, readable and compatible saved match exists.
      *
-     * @return the number of sunk ships as an integer.
-     * @throws GameLoadException if no saved record exists or if the value cannot be parsed.
+     * @return {@code true} when {@link #loadGame()} can restore a match
      */
-    public static int loadNumberShipsSunkPlayerHuman() {
-        String[] data = readStatisticsData();
+    public static synchronized boolean hasValidSave() {
         try {
-            return Integer.parseInt(data[1].trim());
-        } catch (NumberFormatException e) {
-            throw new GameLoadException("Unable to parse the human player's sunk ships count.", e);
+            loadGame();
+            return true;
+        } catch (GameLoadException exception) {
+            return false;
         }
     }
 
     /**
-     * Private helper method that reads the statistics file and splits the CSV line into tokens.
-     * Centralizes reading logic and exception handling.
+     * Backward-compatible alias for {@link #hasValidSave()}.
      *
-     * @return an array of {@String} containing the split values: [turn, shipsSunk, nickname].
-     * @throws GameLoadException if the file is missing, empty, or improperly formatted.
-     */
-    private static String[] readStatisticsData() {
-        if (!isAGameSaved()) {
-            throw new GameLoadException("No previous saved game record exists.", null);
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(STATISTICS_FILE))) {
-            String line = reader.readLine();
-            if (line == null || line.isBlank()) {
-                throw new GameLoadException("The statistics file is empty or corrupted.", null);
-            }
-
-            String[] tokens = line.split(",", -1);
-            if (tokens.length < 3) {
-                throw new GameLoadException("Corrupted statistics file structure.", null);
-            }
-
-            return tokens;
-
-        } catch (IOException e) {
-            throw new GameLoadException("Unable to read the saved game statistics file.", e);
-        }
-    }
-
-    /**
-     * Deletes the serialized state file and the text statistics file from disk.
-     */
-    public static void deleteGame() {
-        File savedGame = new File(SERIALIZED_FILE);
-        File statisticsFile = new File(STATISTICS_FILE);
-
-        if (savedGame.exists()) {
-            savedGame.delete();
-        }
-        if (statisticsFile.exists()) {
-            statisticsFile.delete();
-        }
-    }
-
-    /**
-     * Checks whether both the serialized game state file and the turn text file exist.
-     *
-     * @return {@code true} if both save files exist on disk; {@code false} otherwise.
+     * @return {@code true} when a valid saved match exists
      */
     public static boolean isAGameSaved() {
-        File savedGame = new File(SERIALIZED_FILE);
-        File statisticsFile = new File(STATISTICS_FILE);
-        return savedGame.exists() && statisticsFile.exists();
+        return hasValidSave();
+    }
+
+    /**
+     * Deletes the active match and any files created by the previous storage format.
+     *
+     * @throws GameSaveException if an existing save file cannot be deleted
+     */
+    public static synchronized void deleteGame() {
+        try {
+            Files.deleteIfExists(getSaveFile());
+            Files.deleteIfExists(getSaveDirectory().resolve(TEMP_FILE_NAME));
+            Files.deleteIfExists(Path.of(LEGACY_SERIALIZED_FILE));
+            Files.deleteIfExists(Path.of(LEGACY_STATISTICS_FILE));
+        } catch (IOException exception) {
+            throw new GameSaveException("The saved match could not be deleted.", exception);
+        }
+    }
+
+    /**
+     * Returns the directory used for saved matches.
+     *
+     * @return configured or default save directory
+     */
+    public static Path getSaveDirectory() {
+        String configuredDirectory = System.getProperty(SAVE_DIRECTORY_PROPERTY);
+        if (configuredDirectory != null && !configuredDirectory.isBlank()) {
+            return Path.of(configuredDirectory).toAbsolutePath().normalize();
+        }
+        return Path.of(System.getProperty("user.home"), DEFAULT_DIRECTORY_NAME)
+                .toAbsolutePath()
+                .normalize();
+    }
+
+    /**
+     * Returns the complete path of the active save file.
+     *
+     * @return active-session file path
+     */
+    public static Path getSaveFile() {
+        return getSaveDirectory().resolve(SAVE_FILE_NAME);
+    }
+
+    /**
+     * Moves a completed temporary snapshot into the active save location.
+     *
+     * @param temporaryFile fully written temporary file
+     * @param saveFile      final active-session path
+     * @throws IOException if neither an atomic nor regular replacement succeeds
+     */
+    private static void replaceSaveFile(Path temporaryFile, Path saveFile) throws IOException {
+        try {
+            Files.move(
+                    temporaryFile,
+                    saveFile,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+        } catch (AtomicMoveNotSupportedException exception) {
+            Files.move(
+                    temporaryFile,
+                    saveFile,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+        }
+    }
+
+    /**
+     * Attempts to remove a temporary file without masking the original failure.
+     *
+     * @param file file to remove
+     */
+    private static void deleteQuietly(Path file) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException ignored) {
+            // The original save exception remains the relevant failure.
+        }
     }
 }

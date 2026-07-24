@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane minHeight="560.0" minWidth="760.0" prefHeight="720.0" prefWidth="1100.0" styleClass="screen-root" stylesheets="@start-view.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.StartController">
+<StackPane minHeight="560.0" minWidth="760.0" prefHeight="720.0" prefWidth="1100.0" styleClass="screen-root" stylesheets="@start-view.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.StartController">
 
     <!-- Darkens the image edges without blocking mouse interaction. -->
     <Region mouseTransparent="true" styleClass="space-vignette" />

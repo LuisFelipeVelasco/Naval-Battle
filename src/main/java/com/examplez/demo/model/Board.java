@@ -1,6 +1,7 @@
 package com.examplez.demo.model;
 
 import java.io.Serializable;
+import java.io.Serial;
 import com.examplez.demo.model.exceptions.AlreadyAttackedException;
 import com.examplez.demo.model.exceptions.InvalidPositionException;
 
@@ -20,16 +21,17 @@ import java.util.List;
  */
 public class Board implements Serializable {
 
+    /** Serialization identifier for persisted boards. */
+    @Serial
+    private static final long serialVersionUID = 2L;
+
     /**
      * The matrix of cells that makes up the board.
      */
     List<List<Cell>> board;
 
-    /**
-     * The size of the board (number of rows/columns). Stored statically,
-     * but should ideally be an instance field.
-     */
-    private static int SizeList;
+    /** Number of rows and columns in this board. */
+    private final int size;
 
     /**
      * State of a cell that has never been used (no ship, no shot).
@@ -70,11 +72,14 @@ public class Board implements Serializable {
      * @param sizeBoard the size of the board (number of rows and columns)
      */
     public Board(int sizeBoard) {
-        SizeList = sizeBoard;
+        if (sizeBoard <= 0) {
+            throw new IllegalArgumentException("The board size must be positive.");
+        }
+        this.size = sizeBoard;
         board = new ArrayList<>();
-        for (int row = 0; row < SizeList; row++) {
+        for (int row = 0; row < size; row++) {
             List<Cell> rowCells = new ArrayList<>();
-            for (int column = 0; column < SizeList; column++) {
+            for (int column = 0; column < size; column++) {
                 rowCells.add(new Cell());
             }
             board.add(rowCells);
@@ -117,10 +122,13 @@ public class Board implements Serializable {
      * @return {@code true} if the placement is valid, {@code false} otherwise
      */
     public boolean isValidPlacement(int row, int column, int size, boolean horizontal) {
+        if (row < 0 || column < 0 || size <= 0) {
+            return false;
+        }
         for (int i = 0; i < size; i++) {
             int currentRow = horizontal ? row : row + i;
             int currentColumn = horizontal ? column + i : column;
-            if (currentRow >= SizeList || currentColumn >= SizeList) {
+            if (currentRow >= this.size || currentColumn >= this.size) {
                 return false; // goes off the board
             }
             if (isShipOnCell(currentRow, currentColumn)) {
@@ -187,8 +195,8 @@ public class Board implements Serializable {
      */
     public boolean isShipSunken(int row, int column) {
         int idOfShip = getIdOfShipOnCell(row, column);
-        for (int i = 0; i < SizeList; i++) {
-            for (int j = 0; j < SizeList; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 Cell currentCell = board.get(i).get(j);
                 if (currentCell.getIdOfShip() == idOfShip) {
                     if (currentCell.getState().equals(SHIP)) return false;
@@ -206,8 +214,8 @@ public class Board implements Serializable {
      *         {@code false} if no ships remain (all are sunken or never existed)
      */
     public boolean isBoardWithShips() {
-        for (int i = 0; i < SizeList; i++) {
-            for (int j = 0; j < SizeList; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 Cell currentCell = board.get(i).get(j);
                 if (currentCell.getState().equals(SHIP) || currentCell.getState().equals(HIT)) {
                     return true;
@@ -226,8 +234,8 @@ public class Board implements Serializable {
      */
     public void sinkShip(int row, int column) {
         int idOfShip = getIdOfShipOnCell(row, column);
-        for (int i = 0; i < SizeList; i++) {
-            for (int j = 0; j < SizeList; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 Cell currentCell = board.get(i).get(j);
                 if (currentCell.getIdOfShip() == idOfShip) {
                     currentCell.setState(SUNKEN);
@@ -294,4 +302,13 @@ public class Board implements Serializable {
      * @return the number of sunk ships.
      */
     public int getNumberShipsSunk() { return numberShipsSunk; }
+
+    /**
+     * Returns the width and height of this square board.
+     *
+     * @return board size
+     */
+    public int getSize() {
+        return size;
+    }
 }

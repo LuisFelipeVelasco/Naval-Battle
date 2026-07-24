@@ -2,6 +2,7 @@ package com.examplez.demo.model;
 
 import com.examplez.demo.model.exceptions.InvalidPositionException;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -14,10 +15,14 @@ import java.util.List;
  */
 public class PlayerHuman extends Player {
 
+    /** Serialization identifier for persisted human players. */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the human player as entered by the user.
      */
-    public String playerName;
+    private String playerName;
 
     /**
      * Returns the name of the human player.

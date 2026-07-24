@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" styleClass="final-root" stylesheets="@final-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.FinalController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1100.0" styleClass="final-root" stylesheets="@final-style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.examplez.demo.controller.FinalController">
 
    <children>
       <VBox alignment="CENTER" maxWidth="570.0" prefWidth="570.0" spacing="10.0" styleClass="result-card">
@@ -29,6 +29,8 @@
          <Label styleClass="result-kicker" text="BATTLE OUTCOME" />
 
          <Label fx:id="WinnerLabel" alignment="CENTER" maxWidth="500.0" styleClass="winner-label" text="MISSION COMPLETE" textAlignment="CENTER" wrapText="true" />
+
+         <Label fx:id="nicknameLabel" alignment="CENTER" styleClass="nickname-label" text="COMMANDER: READY" />
 
          <Label alignment="CENTER" styleClass="result-message" text="THE BATTLE HAS ENDED" textAlignment="CENTER" wrapText="true" />
 
