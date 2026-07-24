@@ -534,10 +534,8 @@ public class PlayController {
             int currentTurn = playerTurn ? 1 : 0; // 1 = Human turn, 0 = Machine turn
             int shipsSunkByHuman = machineBoard.getNumberShipsSunk(); // Ships sunk on machine's board
 
-            //TASK: Once the getNickname() method is implemented in the PlayerHuman class, uncomment these line of code.
-
-            //String nickname = gameModel.getPlayerHuman().getNickname();
-            //GameFileManager.saveGame(currentState, currentTurn, shipsSunkByHuman, nickname);
+            //String nickname = gameModel.getPlayerHuman().setPlayerName("kjajdf ");
+            GameFileManager.saveGame(currentState, currentTurn, shipsSunkByHuman, "hola");
         } catch (Exception e) {
             System.err.println("Error automatic saving game: " + e.getMessage());
         }
